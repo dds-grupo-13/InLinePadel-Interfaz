@@ -57,3 +57,9 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Conexión con el backend (JWT)
+
+- `apiUrl` está en `src/environments/environment.development.ts` (`http://localhost:8000/api`). Con `ng serve` se usa por defecto, por lo que el backend debe permitir el origen `http://localhost:4200` por CORS.
+- Alternativa con proxy: `ng serve --proxy-config=src/proxy.conf.json` (y poner `apiUrl: '/api'`).
+- Rutas: `/login` (pública) y `/clubes` (requiere sesión). El interceptor agrega `Authorization: Bearer <access>` y, ante un 401, hace un refresh único y reintenta.

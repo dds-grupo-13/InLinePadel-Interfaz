@@ -1,0 +1,11 @@
+<h2>Clubes</h2>
+@if (error()) {
+  <p class="error" role="alert">{{ error() }}</p>
+}
+<ul>
+  @for (club of clubes(); track club.id) {
+    <li>{{ club.denominacion }} — {{ club.direccion }}</li>
+  } @empty {
+    <li>No hay clubes cargados.</li>
+  }
+</ul>
