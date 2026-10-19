@@ -14,6 +14,22 @@ ng test         # pruebas unitarias (Vitest)
 ng build        # build de producción (bundle inicial ~650 kB, el límite del RNF es 1,5 MB)
 ```
 
+## Correrlo con Docker (local)
+
+Sigue el diagrama de despliegue: un contenedor por nodo (Servidor Web, Servidor de Aplicación, Servidor de Base de Datos). El `docker-compose.yml` vive en este repo y asume que el backend (`InLinePadel`) está clonado como carpeta hermana; el `Dockerfile` del backend está en su propio repo.
+
+```bash
+cd InLinePadel-Interfaz
+docker compose up --build
+```
+
+- Aplicación: http://localhost:4200 (nginx con el build de Angular)
+- API: http://localhost:8000/api (gunicorn + Django)
+- Base: PostgreSQL en el volumen `pgdata` (las migraciones corren solas al arrancar)
+- Primer administrador: `docker compose exec app python manage.py createsuperuser`
+
+Los valores por defecto sirven solo para local; para cambiarlos copiá `.env.example` a `.env` junto al compose. Para frenar: `docker compose down` (con `-v` también borra los datos).
+
 ## Pantallas por rol
 
 La barra superior (y la barra inferior en celular) muestra solo lo que corresponde al rol del usuario.
