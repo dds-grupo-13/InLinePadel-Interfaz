@@ -1,0 +1,96 @@
+<div class="contenedor" style="max-width: 860px">
+  <div class="cabecera">
+    <div>
+      <h1>Crear una partida</h1>
+      <p>Elegís el turno y la cancha queda reservada en el mismo paso. Después sumás a los otros tres jugadores.</p>
+    </div>
+  </div>
+
+  <div class="pasos">
+    <section class="paso" [class.hecho]="club && fecha">
+      <h3><span class="n">1</span> ¿Dónde y cuándo querés jugar?</h3>
+      <div class="row g-3">
+        <div class="col-sm-4">
+          <label class="form-label" for="zona">Zona</label>
+          <select id="zona" class="form-select" name="zona" [(ngModel)]="zona" (ngModelChange)="cambioZona()">
+            <option [ngValue]="null">Todas</option>
+            @for (z of zonas(); track z.id) { <option [ngValue]="z.id">{{ z.nombre }}</option> }
+          </select>
+        </div>
+        <div class="col-sm-5">
+          <label class="form-label" for="club">Club</label>
+          <select id="club" class="form-select" name="club" [ngModel]="club" (ngModelChange)="elegirClub($event)">
+            <option [ngValue]="null">Elegí un club</option>
+            @for (c of clubesDeZona(); track c.id) { <option [ngValue]="c.id">{{ c.denominacion }}</option> }
+          </select>
+        </div>
+        <div class="col-sm-3">
+          <label class="form-label" for="fecha">Día</label>
+          <input id="fecha" type="date" class="form-control" name="fecha" [min]="hoy" [(ngModel)]="fecha" (ngModelChange)="cargarTurnos()" />
+        </div>
+      </div>
+      @if (clubElegido(); as c) { <p class="muted small mt-2 mb-0"><i class="bi bi-geo-alt" aria-hidden="true"></i> {{ c.direccion }}</p> }
+    </section>
+
+    <section class="paso" [class.hecho]="turnoElegido()" [class.bloqueado-paso]="!club || !fecha">
+      <h3><span class="n">2</span> Elegí el turno</h3>
+      @if (!club) {
+        <p class="muted mb-0">Primero elegí un club.</p>
+      } @else if (cargandoTurnos()) {
+        <div class="cargando" role="status" aria-label="Buscando turnos"></div>
+      } @else if (turnos().length === 0) {
+        <div class="vacio">
+          <i class="bi bi-calendar-x" aria-hidden="true"></i>
+          <strong>No hay turnos libres ese día</strong>
+          Probá con otro día u otro club.
+        </div>
+      } @else {
+        <div class="fichas" role="radiogroup" aria-label="Turnos libres">
+          @for (t of turnos(); track t.id) {
+            <button type="button" class="ficha libre" [class.elegida]="turnoElegido()?.id === t.id" role="radio" [attr.aria-checked]="turnoElegido()?.id === t.id" (click)="turnoElegido.set(t)">
+              <strong>{{ t.hora_inicio | hhmm }}</strong>
+              <small>Cancha {{ t.cancha_numero }} · {{ t.cancha_tipo === 'TECHADA' ? 'techada' : 'descubierta' }}</small>
+              <small>{{ t.precio | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }} · {{ t.duracion }} min</small>
+            </button>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="paso" [class.bloqueado-paso]="!turnoElegido()">
+      <h3><span class="n">3</span> ¿Quién puede sumarse?</h3>
+      <div class="opciones-posicion" style="grid-template-columns: 1fr 1fr">
+        <label>
+          <input type="radio" name="privacidad" value="PUBLICO" [(ngModel)]="privacidad" [disabled]="!turnoElegido()" />
+          <span>Pública<br /><small class="muted fw-normal">Cualquiera entra con un toque</small></span>
+        </label>
+        <label>
+          <input type="radio" name="privacidad" value="PRIVADO" [(ngModel)]="privacidad" [disabled]="!turnoElegido()" />
+          <span>Solo amigos<br /><small class="muted fw-normal">Entran quienes invitás o aceptás</small></span>
+        </label>
+      </div>
+    </section>
+
+    <section class="paso" [class.bloqueado-paso]="!turnoElegido()">
+      <h3><span class="n">4</span> Confirmá</h3>
+      @if (turnoElegido(); as t) {
+        <dl class="datos mb-3">
+          <div><dt>Cuándo</dt><dd>{{ t.fecha | date: 'EEEE d MMMM' }}, {{ t.hora_inicio | hhmm }}</dd></div>
+          <div><dt>Dónde</dt><dd>{{ t.club_nombre }} · Cancha {{ t.cancha_numero }}</dd></div>
+          <div><dt>Precio total</dt><dd>{{ t.precio | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd></div>
+          <div><dt>Tu parte (entre 4)</dt><dd>{{ precioPorJugador() | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd></div>
+        </dl>
+        <p class="muted small">La reserva es provisoria hasta que se completen los cuatro cupos. Tenés hasta 48 horas (o hasta el horario del turno) para juntar a los demás; si no, el turno se libera solo. El pago se hace en el club.</p>
+      }
+      @if (error()) {
+        <div class="alerta bad mb-3" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span>{{ error() }}</span></div>
+      }
+      <div class="acciones">
+        <a class="btn btn-tool" routerLink="/partidas">Cancelar</a>
+        <button type="button" class="btn btn-primary btn-lg" [disabled]="!turnoElegido() || enviando()" (click)="crear()">
+          {{ enviando() ? 'Reservando…' : 'Reservar y crear partida' }}
+        </button>
+      </div>
+    </section>
+  </div>
+</div>

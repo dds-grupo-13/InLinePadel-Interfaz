@@ -1,0 +1,46 @@
+<div class="contenedor">
+  <div class="cabecera">
+    <div>
+      <h1>Mis partidas</h1>
+      <p>Las partidas donde estás anotado, con el estado de cada reserva.</p>
+    </div>
+    <a class="btn btn-primary" routerLink="/partidas/nueva"><i class="bi bi-plus-lg" aria-hidden="true"></i> Crear una partida</a>
+  </div>
+
+  <div class="pestanas" role="tablist">
+    <button type="button" role="tab" [class.activa]="pestana() === 'proximas'" [attr.aria-selected]="pestana() === 'proximas'" (click)="pestana.set('proximas')">
+      Próximas<span class="cuenta">{{ proximas().length }}</span>
+    </button>
+    <button type="button" role="tab" [class.activa]="pestana() === 'historial'" [attr.aria-selected]="pestana() === 'historial'" (click)="pestana.set('historial')">
+      Historial
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="alerta bad" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span>{{ error() }}</span></div>
+  }
+  @if (cargando()) {
+    <div class="cargando" role="status" aria-label="Cargando"></div>
+  } @else {
+    <div class="lista-partidas">
+      @for (l of visibles(); track l.id) {
+        <app-partida-card [lobby]="l" [esMia]="true" />
+      } @empty {
+        <div class="vacio" style="grid-column: 1 / -1">
+          <i class="bi bi-calendar2-x" aria-hidden="true"></i>
+          @if (pestana() === 'proximas') {
+            <strong>No tenés partidas próximas</strong>
+            Buscá una con lugar o armá la tuya.
+            <div class="mt-3 acciones justify-content-center">
+              <a class="btn btn-primary" routerLink="/partidas">Buscar partidas</a>
+              <a class="btn btn-tool" routerLink="/partidas/nueva">Crear una</a>
+            </div>
+          } @else {
+            <strong>Todavía no hay historial</strong>
+            Acá van a aparecer las partidas jugadas y canceladas.
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,113 @@
+<div class="contenedor">
+  <div class="cabecera">
+    <div>
+      <h1>Grilla de turnos</h1>
+      <p>Los turnos que publicaste. Un turno publicado es un compromiso: los jugadores lo toman sin consultarte.</p>
+    </div>
+    <div class="acciones">
+      <app-club-selector />
+      <a class="btn btn-primary" routerLink="/club/turnos/publicar"><i class="bi bi-calendar-plus" aria-hidden="true"></i> Publicar turnos</a>
+    </div>
+  </div>
+
+  <div class="panel mb-3 d-flex flex-wrap gap-3 align-items-center justify-content-between">
+    <div class="nav-fecha">
+      <button type="button" class="btn btn-tool" (click)="mover(-1)" aria-label="Día anterior"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
+      <input type="date" class="form-control" [ngModel]="fecha()" (ngModelChange)="fecha.set($event || fecha())" aria-label="Día" />
+      <button type="button" class="btn btn-tool" (click)="mover(1)" aria-label="Día siguiente"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    </div>
+    <strong class="titulo fs-4">{{ fecha() | date: 'EEEE d MMMM' }}</strong>
+    <div class="d-flex flex-wrap gap-2 small">
+      <app-estado valor="LIBRE" /><app-estado valor="BLOQUEADO" /><app-estado valor="CONFIRMADO" /><app-estado valor="NO_DISPONIBLE" />
+    </div>
+  </div>
+
+  @if (error()) { <div class="alerta bad mb-3" role="alert"><span>{{ error() }}</span></div> }
+  @if (cargando()) {
+    <div class="cargando" role="status" aria-label="Cargando"></div>
+  } @else if (columnas().length === 0) {
+    <div class="vacio panel">
+      <i class="bi bi-columns-gap" aria-hidden="true"></i>
+      <strong>Primero cargá tus canchas</strong>
+      <a class="btn btn-primary mt-2" routerLink="/club/canchas">Ir a canchas</a>
+    </div>
+  } @else {
+    <div class="d-grid gap-3">
+      @for (col of columnas(); track col.cancha.id) {
+        <section class="panel">
+          <h3>Cancha {{ col.cancha.numero }} <small class="muted fw-normal fs-6">· {{ col.cancha.tipo === 'TECHADA' ? 'techada' : 'descubierta' }}@if (!col.cancha.activa) { · inactiva }</small></h3>
+          <div class="fichas">
+            @for (t of col.turnos; track t.id) {
+              <button type="button" class="ficha" [class]="'ficha ' + t.estado.toLowerCase()" (click)="abrir(t)">
+                <strong>{{ t.hora_inicio | hhmm }}</strong>
+                <small>{{ t.precio | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</small>
+                <small>{{ t.estado === 'LIBRE' ? 'Libre' : t.estado === 'BLOQUEADO' ? 'Provisoria' : t.estado === 'CONFIRMADO' ? 'Confirmada' : t.estado === 'CUMPLIDO' ? 'Cumplido' : 'No disponible' }}</small>
+              </button>
+            } @empty {
+              <span class="muted">No hay turnos publicados este día.</span>
+            }
+          </div>
+        </section>
+      }
+    </div>
+  }
+
+  <app-modal [abierto]="!!elegido()" [titulo]="editando() ? 'Editar turno' : 'Turno de las ' + (elegido()?.hora_inicio ?? '' | hhmm)" (cerrar)="cerrar()">
+    @if (elegido(); as t) {
+      @if (!editando()) {
+        <dl class="datos mb-3">
+          <div><dt>Día</dt><dd>{{ t.fecha | date: 'EEE d MMM' }}</dd></div>
+          <div><dt>Cancha</dt><dd>N° {{ t.cancha_numero }}</dd></div>
+          <div><dt>Duración</dt><dd>{{ t.duracion }} min</dd></div>
+          <div><dt>Precio</dt><dd>{{ t.precio | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd></div>
+          <div><dt>Estado</dt><dd><app-estado [valor]="t.estado" /></dd></div>
+        </dl>
+        @if (estaEditable(t)) {
+          <div class="pie-modal justify-content-between">
+            <button type="button" class="btn btn-outline-danger" (click)="eliminar()" [disabled]="ocupado()">Eliminar</button>
+            <span class="acciones">
+              <button type="button" class="btn btn-tool" (click)="empezarEdicion()">Editar</button>
+              @if (t.estado === 'LIBRE') {
+                <button type="button" class="btn btn-primary" (click)="retirar()" [disabled]="ocupado()">Retirar de la oferta</button>
+              } @else {
+                <button type="button" class="btn btn-primary" (click)="publicar()" [disabled]="ocupado()">Volver a ofrecerlo</button>
+              }
+            </span>
+          </div>
+        } @else {
+          <div class="alerta info"><i class="bi bi-lock" aria-hidden="true"></i><span>{{ t.estado === 'CUMPLIDO' ? 'Este turno ya se jugó.' : 'Una partida tomó este turno: ya no se puede modificar ni retirar. Mirá los detalles en Ocupación.' }}</span></div>
+        }
+      } @else {
+        <form (ngSubmit)="guardarEdicion()" #ef="ngForm" class="row g-3">
+          <div class="col-6">
+            <label class="form-label" for="e-fecha">Día</label>
+            <input id="e-fecha" type="date" class="form-control" name="fecha" [(ngModel)]="f.fecha" required />
+          </div>
+          <div class="col-6">
+            <label class="form-label" for="e-hora">Hora de inicio</label>
+            <input id="e-hora" type="time" class="form-control" name="hora" [(ngModel)]="f.hora_inicio" required />
+          </div>
+          <div class="col-6">
+            <label class="form-label" for="e-dur">Duración (min)</label>
+            <input id="e-dur" type="number" min="30" step="15" class="form-control" name="duracion" [(ngModel)]="f.duracion" required />
+          </div>
+          <div class="col-6">
+            <label class="form-label" for="e-precio">Precio total</label>
+            <input id="e-precio" type="number" min="0" step="500" class="form-control" name="precio" [(ngModel)]="f.precio" required />
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="e-cancha">Cancha</label>
+            <select id="e-cancha" class="form-select" name="cancha" [(ngModel)]="f.cancha">
+              @for (c of canchas(); track c.id) { <option [ngValue]="c.id">Cancha {{ c.numero }}</option> }
+            </select>
+          </div>
+          @if (errorForm()) { <div class="col-12"><div class="alerta bad" role="alert"><span>{{ errorForm() }}</span></div></div> }
+          <div class="pie-modal col-12 mt-2">
+            <button type="button" class="btn btn-tool" (click)="editando.set(false)">Volver</button>
+            <button type="submit" class="btn btn-primary" [disabled]="ef.invalid || ocupado()">Guardar</button>
+          </div>
+        </form>
+      }
+    }
+  </app-modal>
+</div>

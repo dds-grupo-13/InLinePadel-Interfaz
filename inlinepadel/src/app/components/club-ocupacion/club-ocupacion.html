@@ -1,0 +1,52 @@
+<div class="contenedor">
+  <div class="cabecera">
+    <div>
+      <h1>Ocupación</h1>
+      <p>Cada cancha por franja horaria, con la partida que tomó el turno y el estado de su reserva.</p>
+    </div>
+    <app-club-selector />
+  </div>
+
+  <div class="panel mb-3 d-flex flex-wrap gap-3 align-items-center justify-content-between">
+    <div class="nav-fecha">
+      <button type="button" class="btn btn-tool" (click)="mover(-1)" aria-label="Día anterior"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
+      <input type="date" class="form-control" [ngModel]="fecha()" (ngModelChange)="fecha.set($event || fecha())" aria-label="Día" />
+      <button type="button" class="btn btn-tool" (click)="mover(1)" aria-label="Día siguiente"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    </div>
+    <strong class="titulo fs-4">{{ fecha() | date: 'EEEE d MMMM' }}</strong>
+  </div>
+
+  @if (error()) { <div class="alerta bad mb-3" role="alert"><span>{{ error() }}</span></div> }
+  @if (cargando()) {
+    <div class="cargando" role="status" aria-label="Cargando"></div>
+  } @else {
+    <div class="row g-3">
+      @for (c of porCancha(); track c.numero) {
+        <div class="col-lg-6">
+          <section class="panel h-100">
+            <h3>Cancha {{ c.numero }}</h3>
+            @for (t of c.lista; track t.id) {
+              <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 py-2 border-top">
+                <div class="d-flex align-items-center gap-3">
+                  <strong class="titulo fs-4" style="min-width: 3.4rem">{{ t.hora_inicio | hhmm }}</strong>
+                  @if (t.lobby; as l) { <app-cupos [ocupados]="l.cupos_ocupados" [ancho]="64" /> }
+                </div>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                  @if (t.lobby; as l) {
+                    <app-estado [valor]="l.reserva" />
+                    <app-estado [valor]="l.privacidad" />
+                    @if (l.codigo_reserva) { <code class="fs-6">{{ l.codigo_reserva }}</code> }
+                  } @else {
+                    <app-estado [valor]="t.estado" />
+                  }
+                </div>
+              </div>
+            }
+          </section>
+        </div>
+      } @empty {
+        <div class="col-12"><div class="vacio panel"><i class="bi bi-calendar2" aria-hidden="true"></i><strong>No hay turnos publicados este día</strong></div></div>
+      }
+    </div>
+  }
+</div>

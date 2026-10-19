@@ -1,0 +1,43 @@
+<div class="contenedor" style="max-width: 760px">
+  <div class="cabecera">
+    <div>
+      <h1>Avisos</h1>
+      <p>Lo que pasó con tus partidas, invitaciones y reservas.</p>
+    </div>
+    <button type="button" class="btn btn-tool" (click)="marcarTodas()"><i class="bi bi-check2-all" aria-hidden="true"></i> Marcar todo como leído</button>
+  </div>
+
+  <div class="pestanas" role="tablist">
+    <button type="button" role="tab" [class.activa]="!soloNuevas()" (click)="filtrar(false)">Todos</button>
+    <button type="button" role="tab" [class.activa]="soloNuevas()" (click)="filtrar(true)">Sin leer</button>
+  </div>
+
+  @if (error()) {
+    <div class="alerta bad mb-3" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span>{{ error() }}</span></div>
+  }
+  @if (cargando()) {
+    <div class="cargando" role="status" aria-label="Cargando"></div>
+  } @else {
+    <div class="panel p-0 overflow-hidden">
+      @for (n of items(); track n.id) {
+        <div class="notif" [class.nueva]="!n.leida">
+          <span class="punto" aria-hidden="true"></span>
+          <div class="flex-grow-1">
+            <div>{{ n.mensaje }}</div>
+            <small class="muted">{{ n.fecha | date: "EEE d MMM, HH:mm" }}</small>
+          </div>
+          @if (!n.leida) {
+            <button type="button" class="btn btn-tool btn-sm" (click)="leer(n)">Marcar leído</button>
+          }
+        </div>
+      } @empty {
+        <div class="vacio">
+          <i class="bi bi-bell-slash" aria-hidden="true"></i>
+          <strong>{{ soloNuevas() ? 'No tenés avisos sin leer' : 'Todavía no tenés avisos' }}</strong>
+          Te avisamos cuando se complete una partida, te inviten o cambie una reserva.
+        </div>
+      }
+    </div>
+    <app-paginador [count]="total()" [pagina]="pagina()" (cambio)="cargar($event)" />
+  }
+</div>

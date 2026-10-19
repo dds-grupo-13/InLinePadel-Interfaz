@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Service, inject, signal } from '@angular/core';
+import { Service, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { LoginResponse, Usuario } from '../models/usuario.model';
+import { LoginResponse, Rol, Usuario } from '../models/usuario.model';
 
 const ACCESS_KEY = 'access';
 const REFRESH_KEY = 'refresh';
@@ -42,6 +42,27 @@ export class AuthService {
 
   readonly usuarioActual = this._usuario.asReadonly();
   readonly isLoggedIn = this._logueado.asReadonly();
+
+  /** Rol que decide qué pantallas se ofrecen: sistema > club > jugador. */
+  readonly rol = computed<Rol | null>(() => {
+    const u = this._usuario();
+    if (!u) return null;
+    if (u.es_admin_sistema) return 'sistema';
+    if (u.es_admin_club) return 'club';
+    return 'jugador';
+  });
+
+  /** Pantalla de inicio de cada rol. */
+  inicio(): string {
+    const rol = this.rol();
+    return rol === 'sistema' ? '/admin/clubes' : rol === 'club' ? '/club' : '/partidas';
+  }
+
+  /** Guarda el perfil actualizado (ej: tras editar el perfil propio). */
+  actualizarUsuario(usuario: Usuario): void {
+    escribir(USUARIO_KEY, JSON.stringify(usuario));
+    this._usuario.set(usuario);
+  }
 
   login(username: string, password: string): Observable<LoginResponse> {
     return this.http

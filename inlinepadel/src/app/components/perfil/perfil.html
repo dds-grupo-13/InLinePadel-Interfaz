@@ -1,0 +1,78 @@
+<div class="contenedor" style="max-width: 760px">
+  <div class="cabecera">
+    <div>
+      <h1>Mi perfil</h1>
+      <p>Tu posición y tu zona ayudan a encontrar partidas que te queden bien.</p>
+    </div>
+  </div>
+
+  <form class="panel mb-4" (ngSubmit)="guardar()" #pf="ngForm">
+    <h2>Datos personales</h2>
+    <div class="row g-3">
+      <div class="col-sm-6">
+        <label class="form-label" for="u">Usuario</label>
+        <input id="u" class="form-control" [value]="username" disabled />
+      </div>
+      <div class="col-sm-6">
+        <label class="form-label" for="email">Email</label>
+        <input id="email" type="email" class="form-control" name="email" [(ngModel)]="f.email" required [class.is-invalid]="errores()['email']" />
+        @if (errores()['email']) { <div class="campo-error">{{ errores()['email'] }}</div> }
+      </div>
+      <div class="col-sm-6">
+        <label class="form-label" for="fn">Nombre</label>
+        <input id="fn" class="form-control" name="first_name" [(ngModel)]="f.first_name" [class.is-invalid]="errores()['first_name']" />
+      </div>
+      <div class="col-sm-6">
+        <label class="form-label" for="ln">Apellido</label>
+        <input id="ln" class="form-control" name="last_name" [(ngModel)]="f.last_name" [class.is-invalid]="errores()['last_name']" />
+      </div>
+      <div class="col-12">
+        <fieldset>
+          <legend class="form-label">¿De qué lado jugás?</legend>
+          <div class="opciones-posicion">
+            @for (p of posiciones; track p.valor) {
+              <label><input type="radio" name="posicion" [value]="p.valor" [(ngModel)]="posicion" /><span>{{ p.etiqueta }}</span></label>
+            }
+          </div>
+        </fieldset>
+      </div>
+      <div class="col-12">
+        <label class="form-label" for="zona">Zona habitual</label>
+        <select id="zona" class="form-select" name="zona" [(ngModel)]="zona">
+          <option [ngValue]="null">Sin definir</option>
+          @for (z of zonas(); track z.id) { <option [ngValue]="z.id">{{ z.nombre }}</option> }
+        </select>
+      </div>
+    </div>
+    <div class="mt-3"><button type="submit" class="btn btn-primary" [disabled]="pf.invalid || guardando()">{{ guardando() ? 'Guardando…' : 'Guardar cambios' }}</button></div>
+  </form>
+
+  <form class="panel mb-4" (ngSubmit)="cambiarClave()" #cf="ngForm">
+    <h2>Cambiar contraseña</h2>
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label" for="pa">Contraseña actual</label>
+        <input id="pa" type="password" class="form-control" name="password_actual" [(ngModel)]="clave.password_actual" required autocomplete="current-password" [class.is-invalid]="erroresClave()['password_actual']" />
+        @if (erroresClave()['password_actual']) { <div class="campo-error">{{ erroresClave()['password_actual'] }}</div> }
+      </div>
+      <div class="col-sm-6">
+        <label class="form-label" for="pn">Contraseña nueva</label>
+        <input id="pn" type="password" class="form-control" name="password" [(ngModel)]="clave.password" required minlength="8" autocomplete="new-password" [class.is-invalid]="erroresClave()['password']" />
+        <div class="form-text">Mínimo 8 caracteres.</div>
+        @if (erroresClave()['password']) { <div class="campo-error">{{ erroresClave()['password'] }}</div> }
+      </div>
+      <div class="col-sm-6">
+        <label class="form-label" for="pr">Repetí la nueva</label>
+        <input id="pr" type="password" class="form-control" name="repetir" [(ngModel)]="clave.repetir" required autocomplete="new-password" [class.is-invalid]="noCoinciden" />
+        @if (noCoinciden) { <div class="campo-error">Las contraseñas no coinciden.</div> }
+      </div>
+    </div>
+    <div class="mt-3"><button type="submit" class="btn btn-primary" [disabled]="cf.invalid || noCoinciden || cambiandoClave()">Cambiar contraseña</button></div>
+  </form>
+
+  <section class="panel" style="border-color: var(--ip-bad)">
+    <h2>Dar de baja la cuenta</h2>
+    <p class="muted">Salís de todas tus partidas vigentes y no podés volver a usar esta cuenta.</p>
+    <button type="button" class="btn btn-outline-danger" (click)="darDeBaja()">Dar de baja mi cuenta</button>
+  </section>
+</div>

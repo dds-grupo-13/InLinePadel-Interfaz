@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
+import { leerError } from '../../utils/errores';
 
 @Component({
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   selector: 'app-login',
-  styleUrl: './login.css',
   templateUrl: './login.html',
 })
 export class Login {
@@ -16,20 +16,17 @@ export class Login {
   username = '';
   password = '';
   readonly error = signal<string | null>(null);
+  readonly enviando = signal(false);
 
   onSubmit(): void {
     this.error.set(null);
-    this.auth.login(this.username, this.password).subscribe({
-      next: () => this.router.navigate(['/clubes']),
-      error: (e) => this.error.set(this.mensaje(e)),
+    this.enviando.set(true);
+    this.auth.login(this.username.trim(), this.password).subscribe({
+      next: () => this.router.navigateByUrl(this.auth.inicio()),
+      error: (e) => {
+        this.enviando.set(false);
+        this.error.set(leerError(e, 'No pudimos iniciar tu sesión. Probá de nuevo.').mensaje);
+      },
     });
-  }
-
-  private mensaje(e: { status?: number; error?: unknown }): string {
-    if (e.status === 0) return 'No se pudo conectar con el servidor';
-    if (e.status === 429) return 'Demasiados intentos, probá más tarde';
-    const cuerpo = e.error as Record<string, unknown> | undefined;
-    const detalle = cuerpo?.['detail'] ?? cuerpo?.['non_field_errors'];
-    return typeof detalle === 'string' ? detalle : Array.isArray(detalle) ? detalle.join(' ') : 'Credenciales inválidas';
   }
 }

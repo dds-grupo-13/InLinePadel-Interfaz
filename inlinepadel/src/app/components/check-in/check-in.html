@@ -1,0 +1,20 @@
+<div class="contenedor" style="max-width: 560px">
+  <div class="cabecera">
+    <div>
+      <h1>Registrar llegada</h1>
+      <p>Cuando los jugadores lleguen, pedíles el código de reserva y validalo acá. Se puede registrar desde 15 minutos antes del turno.</p>
+    </div>
+  </div>
+  <form class="panel d-grid gap-3" (ngSubmit)="validar()" #f="ngForm">
+    <div>
+      <label class="form-label" for="codigo">Código de reserva</label>
+      <input id="codigo" class="form-control form-control-lg text-center titulo" style="font-size: 2rem; letter-spacing: 0.15em" name="codigo" [(ngModel)]="codigo" (ngModelChange)="formatear()" placeholder="XXXX-XXXX" autocomplete="off" autocapitalize="characters" inputmode="text" required minlength="9" />
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg" [disabled]="f.invalid || enviando()">{{ enviando() ? 'Validando…' : 'Validar código' }}</button>
+    @if (resultado(); as r) {
+      <div class="alerta" [class]="r.ok ? 'alerta ok' : 'alerta bad'" role="status">
+        <i class="bi" [class]="r.ok ? 'bi-check-circle-fill' : 'bi-x-circle-fill'" aria-hidden="true"></i><span>{{ r.texto }}</span>
+      </div>
+    }
+  </form>
+</div>

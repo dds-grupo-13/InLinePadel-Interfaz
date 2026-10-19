@@ -1,16 +1,41 @@
-# Inlinepadel
+# InLine Padel — Interfaz (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.3.
+Frontend del sistema InLine Padel (Grupo 13, Desarrollo de Software, UTN FRD). Consume la API del repositorio `InLinePadel` (Django REST).
 
-## Development server
+## Cómo correrlo
 
-To start a local development server, run:
+1. Levantar el backend en `http://localhost:8000` (ver el README del repositorio `InLinePadel`).
+2. En esta carpeta:
 
 ```bash
-ng serve
+npm install
+ng serve        # http://localhost:4200, las llamadas a /api se redirigen al backend con src/proxy.conf.json
+ng test         # pruebas unitarias (Vitest)
+ng build        # build de producción (bundle inicial ~650 kB, el límite del RNF es 1,5 MB)
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Pantallas por rol
+
+La barra superior (y la barra inferior en celular) muestra solo lo que corresponde al rol del usuario.
+
+| Rol | Pantallas |
+|---|---|
+| Sin sesión | Ingresar, Crear cuenta |
+| Jugador | Partidas (buscar con filtros), Nueva partida (4 pasos), Detalle de partida (reserva, código, invitar, solicitudes), Mis partidas, Contactos, Pedidos, Perfil |
+| Administrador de club | Resumen, Canchas, Turnos (grilla), Publicar turnos (masivo), Ocupación, Check-in por código |
+| Administrador del sistema | Clubes (alta, suspensión, baja), Zonas |
+| Todos | Notificaciones |
+
+## Estructura
+
+- `models/`: tipos de la API. `services/`: acceso HTTP y estado compartido. `guards/`: acceso por rol. `utils/`: errores en lenguaje natural, fechas, paginación.
+- `components/`: una pantalla por carpeta; `components/shared/` tiene las piezas reutilizables (estado, cancha con cupos, banner de reserva, paginador, modal).
+- Estilos: Bootstrap 5.3 + tema propio en `src/styles.css` (modo claro/oscuro según el sistema).
+
+## Notas
+
+- Los errores del backend (incluido el 409) se muestran en lenguaje natural, nunca con códigos técnicos.
+- Material extra respecto de la bibliografía de la cátedra: Bootstrap Icons y las fuentes autoalojadas (`@fontsource`).
 
 ## Code scaffolding
 

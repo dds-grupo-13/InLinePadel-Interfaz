@@ -1,0 +1,88 @@
+<div class="contenedor">
+  @if (!ctx.cargado() && !ctx.error()) {
+    <div class="cargando" role="status" aria-label="Cargando"></div>
+  } @else if (ctx.error()) {
+    <div class="alerta bad" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span>{{ ctx.error() }}</span></div>
+  } @else if (!ctx.club()) {
+    <div class="vacio panel">
+      <i class="bi bi-buildings" aria-hidden="true"></i>
+      <strong>Todavía no administrás ningún club</strong>
+      El administrador del sistema tiene que asociarte a un club para que puedas publicar turnos.
+    </div>
+  } @else {
+    @let club = ctx.club()!;
+    <div class="cabecera">
+      <div>
+        <h1>{{ club.denominacion }}</h1>
+        <p>{{ club.direccion }}</p>
+      </div>
+      <div class="acciones">
+        <app-club-selector />
+        <app-estado [valor]="club.estado" />
+      </div>
+    </div>
+
+    @if (club.estado !== 'ACTIVO') {
+      <div class="alerta warn mb-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+        <span>{{ club.estado === 'SUSPENDIDO' ? 'Tu club está suspendido: sus turnos libres no se ofrecen a los jugadores. Las reservas ya confirmadas siguen vigentes.' : 'Tu club está dado de baja y no recibe reservas.' }}</span>
+      </div>
+    }
+    @if (canchas() === 0) {
+      <div class="alerta info mb-3">
+        <i class="bi bi-info-circle" aria-hidden="true"></i>
+        <span>Para recibir partidas, primero <a routerLink="/club/canchas">cargá tus canchas</a> y después <a routerLink="/club/turnos/publicar">publicá los turnos</a>.</span>
+      </div>
+    }
+
+    <h2>Hoy · {{ hoy | date: 'EEEE d MMMM' }}</h2>
+    @if (error()) { <div class="alerta bad mb-3" role="alert"><span>{{ error() }}</span></div> }
+    @if (cargando()) {
+      <div class="cargando" role="status"></div>
+    } @else {
+      <div class="row g-3 mb-4">
+        @for (c of [
+          { n: cuenta().libres, t: 'Libres', i: 'bi-circle', k: 'ok' },
+          { n: cuenta().provisorias, t: 'Reservas provisorias', i: 'bi-hourglass-split', k: 'warn' },
+          { n: cuenta().confirmadas, t: 'Reservas confirmadas', i: 'bi-patch-check', k: 'ok' },
+          { n: cuenta().retirados, t: 'No disponibles', i: 'bi-slash-circle', k: 'off' }
+        ]; track c.t) {
+          <div class="col-6 col-lg-3">
+            <div class="panel h-100">
+              <div class="muted small"><i class="bi" [class]="c.i" aria-hidden="true"></i> {{ c.t }}</div>
+              <div class="titulo" style="font-size: 2.6rem">{{ c.n }}</div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <section class="panel">
+            <h3>Partidas de hoy</h3>
+            @for (t of reservas(); track t.id) {
+              <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 py-2 border-bottom">
+                <div>
+                  <strong>{{ t.hora_inicio | hhmm }}</strong> · Cancha {{ t.cancha_numero }}
+                  <div class="muted small">{{ t.lobby!.cupos_ocupados }} de 4 jugadores</div>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                  <app-estado [valor]="t.lobby!.reserva" />
+                  @if (t.lobby!.codigo_reserva) { <code class="fs-6">{{ t.lobby!.codigo_reserva }}</code> }
+                </div>
+              </div>
+            } @empty {
+              <div class="vacio"><i class="bi bi-calendar2" aria-hidden="true"></i><strong>Hoy no hay partidas en tu club</strong>Cuando un jugador tome un turno, aparece acá.</div>
+            }
+          </section>
+        </div>
+        <div class="col-lg-4 d-grid gap-2 align-content-start">
+          <a class="btn btn-primary btn-lg" routerLink="/club/check-in"><i class="bi bi-qr-code-scan" aria-hidden="true"></i> Registrar llegada</a>
+          <a class="btn btn-tool" routerLink="/club/turnos/publicar"><i class="bi bi-calendar-plus" aria-hidden="true"></i> Publicar turnos</a>
+          <a class="btn btn-tool" routerLink="/club/turnos"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i> Ver grilla de turnos</a>
+          <a class="btn btn-tool" routerLink="/club/ocupacion"><i class="bi bi-bar-chart-steps" aria-hidden="true"></i> Ocupación por día</a>
+        </div>
+      </div>
+    }
+  }
+</div>
