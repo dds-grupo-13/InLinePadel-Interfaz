@@ -1,0 +1,9 @@
+{
+  "name": "inlinepadel-interfaz",
+  "private": true,
+  "scripts": {
+    "start": "npm --prefix inlinepadel start",
+    "build": "npm --prefix inlinepadel run build",
+    "test": "npm --prefix inlinepadel test"
+  }
+}
