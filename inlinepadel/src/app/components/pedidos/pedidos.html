@@ -1,0 +1,102 @@
+<div class="contenedor" style="max-width: 860px">
+  <div class="cabecera">
+    <div>
+      <h1>Invitaciones</h1>
+      <p>Invitaciones a partidas y pedidos de acceso a partidas de solo amigos.</p>
+    </div>
+    <a class="btn btn-tool" routerLink="/contactos"><i class="bi bi-people" aria-hidden="true"></i> Mis contactos</a>
+  </div>
+
+  <div class="pestanas" role="tablist">
+    <button type="button" role="tab" [class.activa]="pestana() === 'recibidas'" (click)="pestana.set('recibidas')">
+      Recibidas @if (recibidasPendientes().length) { <span class="cuenta">{{ recibidasPendientes().length }}</span> }
+    </button>
+    <button type="button" role="tab" [class.activa]="pestana() === 'enviadas'" (click)="pestana.set('enviadas')">Enviadas</button>
+    <button type="button" role="tab" [class.activa]="pestana() === 'accesos'" (click)="pestana.set('accesos')">
+      Pedidos de acceso @if (pendientesParaResponder()) { <span class="cuenta">{{ pendientesParaResponder() }}</span> }
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="alerta bad mb-3" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span>{{ error() }}</span></div>
+  }
+
+  @if (cargando()) {
+    <div class="cargando" role="status" aria-label="Cargando"></div>
+  } @else {
+    @switch (pestana()) {
+      @case ('recibidas') {
+        <ul class="jugadores-lista">
+          @for (i of recibidas(); track i.id) {
+            <li class="flex-wrap">
+              <span class="flex-grow-1">
+                <strong><app-jugador-nombre [id]="i.emisor" /></strong> te invitó a<br />
+                <app-lobby-resumen [id]="i.lobby" />
+                <br /><small class="muted">{{ i.fecha | date: 'd MMM, HH:mm' }}</small>
+              </span>
+              @if (i.estado === 'PENDIENTE') {
+                <span class="acciones">
+                  <button type="button" class="btn btn-primary btn-sm" (click)="aceptarInvitacion(i)" [disabled]="ocupado()">Aceptar</button>
+                  <button type="button" class="btn btn-tool btn-sm" (click)="rechazarInvitacion(i)" [disabled]="ocupado()">Rechazar</button>
+                </span>
+              } @else {
+                <app-estado [valor]="i.estado" />
+              }
+            </li>
+          } @empty {
+            <li class="vacio d-block"><i class="bi bi-inbox" aria-hidden="true"></i><strong>No tenés invitaciones</strong>Cuando un contacto te invite a una partida, aparece acá.</li>
+          }
+        </ul>
+      }
+      @case ('enviadas') {
+        <ul class="jugadores-lista">
+          @for (i of enviadas(); track i.id) {
+            <li class="flex-wrap">
+              <span class="flex-grow-1">
+                Invitaste a <strong><app-jugador-nombre [id]="i.receptor" /></strong><br />
+                <app-lobby-resumen [id]="i.lobby" />
+              </span>
+              <app-estado [valor]="i.estado" />
+            </li>
+          } @empty {
+            <li class="vacio d-block"><i class="bi bi-send" aria-hidden="true"></i><strong>No enviaste invitaciones</strong>Podés invitar a tus contactos desde el detalle de una partida.</li>
+          }
+        </ul>
+      }
+      @case ('accesos') {
+        <h3 class="mt-1">Quieren sumarse a tus partidas</h3>
+        <ul class="jugadores-lista mb-4">
+          @for (s of paraResponder(); track s.id) {
+            <li class="flex-wrap">
+              <span class="flex-grow-1">
+                <strong><app-jugador-nombre [id]="s.jugador" /></strong> pidió entrar a<br />
+                <app-lobby-resumen [id]="s.lobby" />
+              </span>
+              @if (s.estado === 'PENDIENTE') {
+                <span class="acciones">
+                  <button type="button" class="btn btn-primary btn-sm" (click)="aceptarSolicitud(s)" [disabled]="ocupado()">Aceptar</button>
+                  <button type="button" class="btn btn-tool btn-sm" (click)="rechazarSolicitud(s)" [disabled]="ocupado()">Rechazar</button>
+                </span>
+              } @else {
+                <app-estado [valor]="s.estado" />
+              }
+            </li>
+          } @empty {
+            <li class="vacio d-block"><strong>Nadie pidió entrar a tus partidas</strong></li>
+          }
+        </ul>
+        <h3>Mis pedidos de acceso</h3>
+        <ul class="jugadores-lista">
+          @for (s of mias(); track s.id) {
+            <li class="flex-wrap">
+              <span class="flex-grow-1">Pediste entrar a<br /><app-lobby-resumen [id]="s.lobby" /></span>
+              <app-estado [valor]="s.estado" />
+            </li>
+          } @empty {
+            <li class="vacio d-block"><strong>No pediste acceso a ninguna partida</strong></li>
+          }
+        </ul>
+      }
+    }
+  }
+</div>

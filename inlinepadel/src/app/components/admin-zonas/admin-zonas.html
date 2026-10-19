@@ -1,0 +1,39 @@
+<div class="contenedor" style="max-width: 640px">
+  <div class="cabecera">
+    <div>
+      <h1>Zonas</h1>
+      <p>Las zonas ordenan clubes y jugadores. Los jugadores eligen la suya para encontrar partidas cerca.</p>
+    </div>
+  </div>
+
+  <form class="panel mb-3 d-flex gap-2 flex-wrap align-items-end" (ngSubmit)="agregar()">
+    <div class="flex-grow-1">
+      <label class="form-label" for="nz">Nueva zona</label>
+      <input id="nz" class="form-control" name="nueva" [(ngModel)]="nueva" placeholder="Ej: Tigre" required />
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="!nueva.trim()">Agregar</button>
+  </form>
+
+  @if (error()) { <div class="alerta bad mb-3" role="alert"><span>{{ error() }}</span></div> }
+  @if (cargando()) {
+    <div class="cargando" role="status" aria-label="Cargando"></div>
+  } @else {
+    <ul class="jugadores-lista">
+      @for (z of zonas(); track z.id) {
+        <li>
+          @if (editando() === z.id) {
+            <input class="form-control" [attr.aria-label]="'Nombre de la zona ' + z.nombre" name="edit-{{ z.id }}" [(ngModel)]="nombreEdicion" (keyup.enter)="guardar(z)" />
+            <button type="button" class="btn btn-primary btn-sm" (click)="guardar(z)">Guardar</button>
+            <button type="button" class="btn btn-tool btn-sm" (click)="editando.set(null)">Cancelar</button>
+          } @else {
+            <strong class="flex-grow-1">{{ z.nombre }}</strong>
+            <button type="button" class="btn btn-tool btn-sm" (click)="editar(z)">Renombrar</button>
+            <button type="button" class="btn btn-tool btn-sm text-danger" (click)="eliminar(z)" [attr.aria-label]="'Eliminar ' + z.nombre"><i class="bi bi-trash" aria-hidden="true"></i></button>
+          }
+        </li>
+      } @empty {
+        <li class="vacio d-block"><i class="bi bi-geo-alt" aria-hidden="true"></i><strong>Todavía no hay zonas</strong>Creá la primera para poder habilitar clubes.</li>
+      }
+    </ul>
+  }
+</div>

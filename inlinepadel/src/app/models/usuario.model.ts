@@ -13,3 +13,5 @@ export interface LoginResponse {
   refresh: string;
   usuario: Usuario;
 }
+
+export type Rol = 'jugador' | 'club' | 'sistema';

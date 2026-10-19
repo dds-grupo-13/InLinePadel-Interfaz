@@ -1,0 +1,90 @@
+<div class="acceso">
+  <section class="acceso-hero">
+    <a class="marca" routerLink="/login" style="color:#fff">
+      <svg viewBox="0 0 32 32" aria-hidden="true" width="34" height="34">
+        <rect x="1" y="3" width="30" height="26" rx="5" fill="#1d4e9e" stroke="#fff" stroke-width="2" />
+        <line x1="16" y1="3" x2="16" y2="29" stroke="#fff" stroke-width="2" stroke-dasharray="3 2" />
+        <circle cx="23" cy="11" r="3.4" fill="#d8e32b" />
+      </svg>
+      <span>InLine Padel</span>
+    </a>
+    <div>
+      <h1>Tu próximo partido empieza acá.</h1>
+      <p>Con tu posición y tu zona te mostramos las partidas que mejor te quedan. Cuatro cupos, un turno, cero vueltas.</p>
+    </div>
+  </section>
+
+  <section class="acceso-form">
+    <form (ngSubmit)="onSubmit()" #fr="ngForm">
+      <div>
+        <h2>Creá tu cuenta</h2>
+        <p class="muted mb-0">Es gratis. El alquiler de la cancha se paga en el club.</p>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-sm-6">
+          <label class="form-label" for="first_name">Nombre</label>
+          <input id="first_name" class="form-control" name="first_name" [(ngModel)]="f.first_name" required autocomplete="given-name" [class.is-invalid]="errores()['first_name']" />
+          @if (errores()['first_name']) { <div class="campo-error">{{ errores()['first_name'] }}</div> }
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label" for="last_name">Apellido</label>
+          <input id="last_name" class="form-control" name="last_name" [(ngModel)]="f.last_name" required autocomplete="family-name" [class.is-invalid]="errores()['last_name']" />
+          @if (errores()['last_name']) { <div class="campo-error">{{ errores()['last_name'] }}</div> }
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label" for="username">Usuario</label>
+        <input id="username" class="form-control" name="username" [(ngModel)]="f.username" required autocomplete="username" [class.is-invalid]="errores()['username']" />
+        @if (errores()['username']) { <div class="campo-error">{{ errores()['username'] }}</div> }
+      </div>
+      <div>
+        <label class="form-label" for="email">Email</label>
+        <input id="email" class="form-control" type="email" name="email" [(ngModel)]="f.email" required autocomplete="email" [class.is-invalid]="errores()['email']" />
+        @if (errores()['email']) { <div class="campo-error">{{ errores()['email'] }}</div> }
+      </div>
+      <div class="row g-3">
+        <div class="col-sm-6">
+          <label class="form-label" for="password">Contraseña</label>
+          <input id="password" class="form-control" type="password" name="password" [(ngModel)]="f.password" required minlength="8" autocomplete="new-password" [class.is-invalid]="errores()['password']" />
+          <div class="form-text">Mínimo 8 caracteres.</div>
+          @if (errores()['password']) { <div class="campo-error">{{ errores()['password'] }}</div> }
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label" for="repetir">Repetí la contraseña</label>
+          <input id="repetir" class="form-control" type="password" name="repetir" [(ngModel)]="f.repetir" required autocomplete="new-password" [class.is-invalid]="noCoinciden" />
+          @if (noCoinciden) { <div class="campo-error">Las contraseñas no coinciden.</div> }
+        </div>
+      </div>
+
+      <fieldset>
+        <legend class="form-label">¿De qué lado jugás?</legend>
+        <div class="opciones-posicion">
+          @for (p of posiciones; track p.valor) {
+            <label>
+              <input type="radio" name="posicion" [value]="p.valor" [(ngModel)]="posicion" />
+              <span>{{ p.etiqueta }}</span>
+            </label>
+          }
+        </div>
+      </fieldset>
+
+      <div>
+        <label class="form-label" for="zona">Zona donde jugás habitualmente</label>
+        <select id="zona" class="form-select" name="zona" [(ngModel)]="zona">
+          <option [ngValue]="null">Todavía no sé</option>
+          @for (z of zonas(); track z.id) { <option [ngValue]="z.id">{{ z.nombre }}</option> }
+        </select>
+      </div>
+
+      @if (error()) {
+        <div class="alerta bad" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span>{{ error() }}</span></div>
+      }
+      <button type="submit" class="btn btn-primary btn-lg" [disabled]="fr.invalid || noCoinciden || enviando()">
+        {{ enviando() ? 'Creando tu cuenta…' : 'Crear cuenta' }}
+      </button>
+      <p class="text-center mb-0">¿Ya tenés cuenta? <a routerLink="/login">Ingresá</a></p>
+    </form>
+  </section>
+</div>

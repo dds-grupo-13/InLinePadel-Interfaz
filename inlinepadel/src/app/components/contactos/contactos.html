@@ -1,0 +1,100 @@
+<div class="contenedor" style="max-width: 860px">
+  <div class="cabecera">
+    <div>
+      <h1>Contactos</h1>
+      <p>Tu lista de jugadores. Solo podés invitar a las partidas a quienes ya son tus contactos.</p>
+    </div>
+    <a class="btn btn-tool" routerLink="/pedidos"><i class="bi bi-envelope-paper" aria-hidden="true"></i> Invitaciones a partidas</a>
+  </div>
+
+  <div class="pestanas" role="tablist">
+    <button type="button" role="tab" [class.activa]="pestana() === 'amigos'" (click)="pestana.set('amigos')">Mis contactos<span class="cuenta">{{ amigos().length }}</span></button>
+    <button type="button" role="tab" [class.activa]="pestana() === 'recibidas'" (click)="pestana.set('recibidas')">
+      Solicitudes recibidas @if (recibidas().length) { <span class="cuenta">{{ recibidas().length }}</span> }
+    </button>
+    <button type="button" role="tab" [class.activa]="pestana() === 'enviadas'" (click)="pestana.set('enviadas')">Enviadas</button>
+    <button type="button" role="tab" [class.activa]="pestana() === 'buscar'" (click)="pestana.set('buscar')"><i class="bi bi-search" aria-hidden="true"></i> Buscar jugadores</button>
+  </div>
+
+  @if (error()) {
+    <div class="alerta bad mb-3" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span>{{ error() }}</span></div>
+  }
+
+  @if (cargando()) {
+    <div class="cargando" role="status" aria-label="Cargando"></div>
+  } @else {
+    @switch (pestana()) {
+      @case ('amigos') {
+        <ul class="jugadores-lista">
+          @for (c of amigos(); track c.id) {
+            <li>
+              <span class="avatar" aria-hidden="true">●</span>
+              <strong class="flex-grow-1"><app-jugador-nombre [id]="otro(c)" /></strong>
+              <button type="button" class="btn btn-tool btn-sm" (click)="quitar(c)" [disabled]="ocupado()">Quitar</button>
+            </li>
+          } @empty {
+            <li class="vacio d-block">
+              <i class="bi bi-people" aria-hidden="true"></i>
+              <strong>Todavía no tenés contactos</strong>
+              Buscá a tus compañeros de cancha por su usuario y mandales una solicitud.
+              <div class="mt-3"><button type="button" class="btn btn-primary" (click)="pestana.set('buscar')">Buscar jugadores</button></div>
+            </li>
+          }
+        </ul>
+      }
+      @case ('recibidas') {
+        <ul class="jugadores-lista">
+          @for (c of recibidas(); track c.id) {
+            <li>
+              <span class="avatar" aria-hidden="true">●</span>
+              <span class="flex-grow-1"><strong><app-jugador-nombre [id]="otro(c)" /></strong><br /><small class="muted">quiere ser tu contacto</small></span>
+              <button type="button" class="btn btn-primary btn-sm" (click)="aceptar(c)" [disabled]="ocupado()">Aceptar</button>
+              <button type="button" class="btn btn-tool btn-sm" (click)="rechazar(c)" [disabled]="ocupado()">Rechazar</button>
+            </li>
+          } @empty {
+            <li class="vacio d-block"><i class="bi bi-inbox" aria-hidden="true"></i><strong>No tenés solicitudes pendientes</strong></li>
+          }
+        </ul>
+      }
+      @case ('enviadas') {
+        <ul class="jugadores-lista">
+          @for (c of enviadas(); track c.id) {
+            <li>
+              <span class="avatar" aria-hidden="true">●</span>
+              <span class="flex-grow-1"><strong><app-jugador-nombre [id]="otro(c)" /></strong></span>
+              <app-estado valor="PENDIENTE" />
+              <button type="button" class="btn btn-tool btn-sm" (click)="quitar(c, true)" [disabled]="ocupado()">Cancelar</button>
+            </li>
+          } @empty {
+            <li class="vacio d-block"><i class="bi bi-send" aria-hidden="true"></i><strong>No enviaste solicitudes</strong></li>
+          }
+        </ul>
+      }
+      @case ('buscar') {
+        <div class="panel mb-3">
+          <label class="form-label" for="q">Usuario del jugador</label>
+          <input id="q" type="search" class="form-control" name="q" [(ngModel)]="q" (ngModelChange)="escribio()" placeholder="Escribí al menos 2 letras" autocomplete="off" />
+        </div>
+        @if (buscando()) { <div class="cargando" role="status"></div> }
+        <ul class="jugadores-lista">
+          @for (j of resultados(); track j.id) {
+            <li>
+              <span class="avatar" aria-hidden="true">{{ iniciales(j.nombre || j.username) }}</span>
+              <span class="flex-grow-1"><strong>{{ j.nombre }}</strong><br /><small class="muted">&#64;{{ j.username }} · {{ posicion(j.posicion) }}</small></span>
+              @switch (relacion(j.id)) {
+                @case ('ninguna') { <button type="button" class="btn btn-primary btn-sm" (click)="agregar(j)" [disabled]="ocupado()"><i class="bi bi-person-plus" aria-hidden="true"></i> Agregar</button> }
+                @case ('amigo') { <app-estado valor="ACEPTADO" /> }
+                @case ('enviada') { <app-estado valor="PENDIENTE" /> }
+                @case ('recibida') { <button type="button" class="btn btn-tool btn-sm" (click)="pestana.set('recibidas')">Ver su solicitud</button> }
+                @case ('rechazada') { <span class="muted small">Solicitud rechazada</span> }
+              }
+            </li>
+          }
+        </ul>
+        @if (busquedaHecha() && !resultados().length && !buscando()) {
+          <div class="vacio"><i class="bi bi-person-x" aria-hidden="true"></i><strong>No encontramos a nadie con ese usuario</strong>Revisá cómo está escrito.</div>
+        }
+      }
+    }
+  }
+</div>

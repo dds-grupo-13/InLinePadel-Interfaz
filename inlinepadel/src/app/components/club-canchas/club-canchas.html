@@ -1,0 +1,67 @@
+<div class="contenedor" style="max-width: 860px">
+  <div class="cabecera">
+    <div>
+      <h1>Canchas</h1>
+      <p>Las canchas de tu club. Sobre cada una publicás después la grilla de turnos.</p>
+    </div>
+    <div class="acciones">
+      <app-club-selector />
+      <button type="button" class="btn btn-primary" (click)="abrirForm(null)" [disabled]="!ctx.club()"><i class="bi bi-plus-lg" aria-hidden="true"></i> Nueva cancha</button>
+    </div>
+  </div>
+
+  @if (error()) { <div class="alerta bad mb-3" role="alert"><span>{{ error() }}</span></div> }
+  @if (cargando()) {
+    <div class="cargando" role="status" aria-label="Cargando"></div>
+  } @else {
+    <div class="tabla-wrap">
+      <table class="table align-middle">
+        <thead><tr><th>Cancha</th><th>Tipo</th><th>Estado</th><th class="text-end">Acciones</th></tr></thead>
+        <tbody>
+          @for (c of canchas(); track c.id) {
+            <tr>
+              <td><strong class="titulo fs-4">N° {{ c.numero }}</strong></td>
+              <td>{{ c.tipo === 'TECHADA' ? 'Techada' : 'Descubierta' }}</td>
+              <td><span class="estado" [class]="c.activa ? 'estado ok' : 'estado off'">{{ c.activa ? 'Se ofrece' : 'Inactiva' }}</span></td>
+              <td class="text-end nowrap">
+                <button type="button" class="btn btn-tool btn-sm" (click)="abrirForm(c)">Editar</button>
+                <button type="button" class="btn btn-tool btn-sm" (click)="alternarActiva(c)">{{ c.activa ? 'Pausar' : 'Reactivar' }}</button>
+                <button type="button" class="btn btn-tool btn-sm text-danger" (click)="eliminar(c)" [attr.aria-label]="'Eliminar cancha ' + c.numero"><i class="bi bi-trash" aria-hidden="true"></i></button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4"><div class="vacio"><i class="bi bi-columns-gap" aria-hidden="true"></i><strong>Todavía no cargaste canchas</strong>Creá la primera para poder publicar turnos.</div></td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <app-modal [abierto]="formAbierto()" [titulo]="editando ? 'Editar cancha ' + editando.numero : 'Nueva cancha'" (cerrar)="formAbierto.set(false)">
+    @if (formAbierto()) {
+      <form (ngSubmit)="guardar()" #f="ngForm" class="d-grid gap-3">
+        <div>
+          <label class="form-label" for="numero">Número de cancha</label>
+          <input id="numero" type="number" min="1" class="form-control" name="numero" [(ngModel)]="numero" required [class.is-invalid]="erroresCampos()['numero']" />
+          @if (erroresCampos()['numero']) { <div class="campo-error">{{ erroresCampos()['numero'] }}</div> }
+        </div>
+        <div>
+          <label class="form-label" for="tipo">Tipo</label>
+          <select id="tipo" class="form-select" name="tipo" [(ngModel)]="tipo">
+            <option value="TECHADA">Techada</option>
+            <option value="DESCUBIERTA">Descubierta</option>
+          </select>
+        </div>
+        <div class="form-check">
+          <input id="activa" class="form-check-input" type="checkbox" name="activa" [(ngModel)]="activa" />
+          <label class="form-check-label" for="activa">Se ofrece a los jugadores</label>
+        </div>
+        @if (errorForm()) { <div class="alerta bad" role="alert"><span>{{ errorForm() }}</span></div> }
+        <div class="pie-modal mt-0">
+          <button type="button" class="btn btn-tool" (click)="formAbierto.set(false)">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="f.invalid || enviando()">Guardar</button>
+        </div>
+      </form>
+    }
+  </app-modal>
+</div>

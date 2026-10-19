@@ -1,0 +1,174 @@
+<div class="contenedor">
+  <a routerLink="/partidas" class="d-inline-block mb-3"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a las partidas</a>
+
+  @if (cargando()) {
+    <div class="cargando" role="status" aria-label="Cargando partida"></div>
+  } @else if (error()) {
+    <div class="vacio panel">
+      <i class="bi bi-emoji-frown" aria-hidden="true"></i>
+      <strong>{{ error() }}</strong>
+      <a class="btn btn-primary mt-3" routerLink="/partidas">Ver otras partidas</a>
+    </div>
+  } @else if (lobby(); as l) {
+    <div class="cabecera">
+      <div>
+        <h1>{{ l.turno_detalle.fecha | date: 'EEEE d MMMM' }} · {{ l.turno_detalle.hora_inicio | hhmm }}</h1>
+        <p>{{ l.turno_detalle.club_nombre }}@if (zona()) { · {{ zona()!.nombre }} }</p>
+      </div>
+      <div class="acciones">
+        <app-estado [valor]="l.estado" />
+        <app-estado [valor]="l.privacidad" />
+        <button type="button" class="btn btn-tool btn-sm" (click)="cargar()" aria-label="Actualizar"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i></button>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-7 d-grid gap-3 align-content-start">
+        <app-reserva [lobby]="l" />
+
+        <!-- acciones según quién mira y en qué estado está la partida -->
+        @if (vigente()) {
+          <section class="panel" aria-label="Acciones">
+            @if (inscripto()) {
+              <div class="acciones">
+                @if (abierta() && l.cupos_libres > 0) {
+                  <button type="button" class="btn btn-primary" (click)="abrirInvitar()" [disabled]="ocupado()"><i class="bi bi-person-plus" aria-hidden="true"></i> Invitar amigos</button>
+                }
+                <button type="button" class="btn btn-outline-danger" (click)="abandonar()" [disabled]="ocupado()">Salir de la partida</button>
+                @if (l.es_capitan) {
+                  <button type="button" class="btn btn-outline-danger" (click)="cancelar()" [disabled]="ocupado()">Cancelar partida</button>
+                }
+              </div>
+              @if (l.es_capitan && abierta()) {
+                <div class="mt-3 d-flex flex-wrap gap-2 align-items-center">
+                  <span class="muted small">Quién puede sumarse:</span>
+                  <div class="btn-group btn-group-sm" role="group" aria-label="Privacidad">
+                    <button type="button" class="btn" [class]="l.privacidad === 'PUBLICO' ? 'btn btn-primary' : 'btn btn-tool'" (click)="cambiarPrivacidad('PUBLICO')">Cualquiera</button>
+                    <button type="button" class="btn" [class]="l.privacidad === 'PRIVADO' ? 'btn btn-primary' : 'btn btn-tool'" (click)="cambiarPrivacidad('PRIVADO')">Solo amigos</button>
+                  </div>
+                </div>
+              }
+            } @else if (miInvitacion(); as inv) {
+              <p class="mb-2"><strong><app-jugador-nombre [id]="inv.emisor" /></strong> te invitó a esta partida.</p>
+              <div class="acciones">
+                <button type="button" class="btn btn-primary" (click)="responderInvitacion(true)" [disabled]="ocupado()">Aceptar invitación</button>
+                <button type="button" class="btn btn-tool" (click)="responderInvitacion(false)" [disabled]="ocupado()">Rechazar</button>
+              </div>
+            } @else if (miSolicitud()) {
+              <div class="alerta info"><i class="bi bi-hourglass-split" aria-hidden="true"></i><span>Ya pediste acceso. Cuando el capitán responda te avisamos.</span></div>
+            } @else if (abierta() && l.cupos_libres > 0) {
+              <button type="button" class="btn btn-primary btn-lg" (click)="unirse()" [disabled]="ocupado()">
+                {{ l.privacidad === 'PRIVADO' ? 'Pedir acceso al capitán' : 'Unirme a la partida' }}
+              </button>
+              <span class="muted ms-2">Tu parte: {{ l.precio_por_jugador | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
+            } @else {
+              <div class="alerta warn"><i class="bi bi-info-circle" aria-hidden="true"></i><span>Esta partida ya no tiene lugares disponibles.</span></div>
+            }
+          </section>
+        }
+
+        @if (solicitudes().length) {
+          <section class="panel" aria-label="Pedidos de acceso">
+            <h3>Quieren sumarse</h3>
+            <ul class="list-unstyled d-grid gap-2 mb-0">
+              @for (s of solicitudes(); track s.id) {
+                <li class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                  <strong><app-jugador-nombre [id]="s.jugador" /></strong>
+                  <span class="acciones">
+                    <button type="button" class="btn btn-primary btn-sm" (click)="responderSolicitud(s, true)" [disabled]="ocupado()">Aceptar</button>
+                    <button type="button" class="btn btn-tool btn-sm" (click)="responderSolicitud(s, false)" [disabled]="ocupado()">Rechazar</button>
+                  </span>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        <section class="panel">
+          <h3>Datos del turno</h3>
+          <dl class="datos">
+            <div><dt>Cancha</dt><dd>N° {{ l.turno_detalle.cancha_numero }} · {{ l.turno_detalle.cancha_tipo === 'TECHADA' ? 'Techada' : 'Descubierta' }}</dd></div>
+            <div><dt>Duración</dt><dd>{{ l.turno_detalle.duracion }} minutos</dd></div>
+            <div><dt>Precio total</dt><dd>{{ l.precio_total | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd></div>
+            <div><dt>Por jugador</dt><dd>{{ l.precio_por_jugador | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd></div>
+            @if (club(); as c) { <div><dt>Dirección</dt><dd>{{ c.direccion }}</dd></div> }
+            @if (l.estado === 'EN_FORMACION') {
+              <div><dt>Plazo para completar</dt><dd>{{ l.plazo_limite | date: 'EEE d/M, HH:mm' }}</dd></div>
+            }
+          </dl>
+          <p class="muted small mt-3 mb-0">El alquiler se paga en el mostrador del club. Si no se completan los cuatro cupos antes del plazo, el turno se libera solo.</p>
+        </section>
+      </div>
+
+      <div class="col-lg-5 d-grid gap-3 align-content-start">
+        <section class="panel">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h3 class="mb-0">Jugadores</h3>
+            <span class="muted">{{ l.cupos_ocupados }} de 4</span>
+          </div>
+          <div class="d-flex justify-content-center mb-3"><app-cupos [inscripciones]="l.inscripciones" [ancho]="220" /></div>
+          <ul class="jugadores-lista">
+            @for (p of puestos(); track p.cupo) {
+              @if (p.jugador; as j) {
+                <li>
+                  <span class="avatar" aria-hidden="true">{{ iniciales(j.nombre || j.username) }}</span>
+                  <span>
+                    <strong>{{ j.nombre || j.username }}</strong>@if (j.id === miId()) { <span class="muted"> (vos)</span> }
+                    <br /><small class="muted">{{ posicion(j.posicion) }}</small>
+                  </span>
+                  @if (j.id === l.capitan) { <span class="estado info ms-auto">Capitán</span> }
+                </li>
+              } @else {
+                <li class="libre"><span class="avatar" aria-hidden="true">{{ p.cupo }}</span><span>Lugar libre</span></li>
+              }
+            }
+          </ul>
+        </section>
+
+        @if (invitacionesEnviadas().length) {
+          <section class="panel">
+            <h3>Invitaciones enviadas</h3>
+            <ul class="list-unstyled d-grid gap-2 mb-0">
+              @for (i of invitacionesEnviadas(); track i.id) {
+                <li class="d-flex justify-content-between align-items-center gap-2">
+                  <app-jugador-nombre [id]="i.receptor" /><app-estado [valor]="i.estado" />
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      </div>
+    </div>
+
+    <app-modal [abierto]="invitarAbierto()" titulo="Invitar amigos" (cerrar)="invitarAbierto.set(false)">
+      @if (cargandoContactos()) {
+        <div class="cargando" role="status"></div>
+      } @else if (contactos().length === 0) {
+        <div class="vacio">
+          <i class="bi bi-people" aria-hidden="true"></i>
+          <strong>No tenés contactos para invitar</strong>
+          Agregá jugadores a tu lista de contactos y después invitalos desde acá.
+          <div class="mt-3"><a class="btn btn-primary" routerLink="/contactos" (click)="invitarAbierto.set(false)">Ir a contactos</a></div>
+        </div>
+      } @else {
+        <p class="muted">Una invitación no guarda el lugar: si la partida se llena antes, vence.</p>
+        <ul class="jugadores-lista">
+          @for (c of contactos(); track c.id) {
+            <li>
+              <input class="form-check-input mt-0" type="checkbox" [id]="'inv-' + c.id" [checked]="elegidos().has(c.id)" (change)="alternar(c.id)" />
+              <label [for]="'inv-' + c.id" class="flex-grow-1" style="cursor:pointer">
+                <strong>{{ c.nombre }}</strong><br /><small class="muted">{{ posicion(c.posicion) }}</small>
+              </label>
+            </li>
+          }
+        </ul>
+        <div class="pie-modal">
+          <button type="button" class="btn btn-tool" (click)="invitarAbierto.set(false)">Cancelar</button>
+          <button type="button" class="btn btn-primary" [disabled]="elegidos().size === 0 || ocupado()" (click)="enviarInvitaciones()">
+            Enviar {{ elegidos().size === 1 ? 'invitación' : 'invitaciones' }}
+          </button>
+        </div>
+      }
+    </app-modal>
+  }
+</div>

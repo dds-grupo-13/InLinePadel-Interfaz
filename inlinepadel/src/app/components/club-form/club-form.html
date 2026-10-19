@@ -1,0 +1,76 @@
+<div class="contenedor" style="max-width: 680px">
+  <a routerLink="/admin/clubes" class="d-inline-block mb-3"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a los clubes</a>
+  <div class="cabecera">
+    <div>
+      <h1>{{ esEdicion() ? 'Editar club' : 'Habilitar un club' }}</h1>
+      @if (!esEdicion()) { <p>Cargá los datos del club y las credenciales de quien lo va a administrar.</p> }
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="cargando" role="status" aria-label="Cargando"></div>
+  } @else {
+    <form class="d-grid gap-4" (ngSubmit)="guardar()" #fr="ngForm">
+      <section class="panel d-grid gap-3">
+        <h2 class="mb-0">Datos del club</h2>
+        <div>
+          <label class="form-label" for="den">Nombre del club</label>
+          <input id="den" class="form-control" name="denominacion" [(ngModel)]="f.denominacion" required [class.is-invalid]="errores()['denominacion']" />
+          @if (errores()['denominacion']) { <div class="campo-error">{{ errores()['denominacion'] }}</div> }
+        </div>
+        <div>
+          <label class="form-label" for="dir">Dirección</label>
+          <input id="dir" class="form-control" name="direccion" [(ngModel)]="f.direccion" required />
+        </div>
+        <div>
+          <label class="form-label" for="zona">Zona</label>
+          <select id="zona" class="form-select" name="zona" [(ngModel)]="zona" required>
+            <option [ngValue]="null" disabled>Elegí una zona</option>
+            @for (z of zonas(); track z.id) { <option [ngValue]="z.id">{{ z.nombre }}</option> }
+          </select>
+          @if (!zonas().length) { <div class="form-text">Todavía no hay zonas. <a routerLink="/admin/zonas">Creá una</a> primero.</div> }
+        </div>
+      </section>
+
+      @if (!esEdicion()) {
+        <section class="panel d-grid gap-3">
+          <h2 class="mb-0">Administrador del club</h2>
+          <div class="btn-group" role="group" aria-label="Administrador">
+            <button type="button" class="btn" [class]="modoAdmin === 'nuevo' ? 'btn btn-primary' : 'btn btn-tool'" (click)="modoAdmin = 'nuevo'">Crear acceso nuevo</button>
+            <button type="button" class="btn" [class]="modoAdmin === 'existente' ? 'btn btn-primary' : 'btn btn-tool'" (click)="modoAdmin = 'existente'">Usar un usuario existente</button>
+          </div>
+          @if (modoAdmin === 'nuevo') {
+            <div>
+              <label class="form-label" for="au">Usuario</label>
+              <input id="au" class="form-control" name="admin_username" [(ngModel)]="f.admin_username" required autocomplete="off" [class.is-invalid]="errores()['admin_username']" />
+              @if (errores()['admin_username']) { <div class="campo-error">{{ errores()['admin_username'] }}</div> }
+            </div>
+            <div>
+              <label class="form-label" for="ae">Email</label>
+              <input id="ae" type="email" class="form-control" name="admin_email" [(ngModel)]="f.admin_email" required autocomplete="off" [class.is-invalid]="errores()['admin_email']" />
+              @if (errores()['admin_email']) { <div class="campo-error">{{ errores()['admin_email'] }}</div> }
+            </div>
+            <div>
+              <label class="form-label" for="ap">Contraseña inicial</label>
+              <input id="ap" type="password" class="form-control" name="admin_password" [(ngModel)]="f.admin_password" required minlength="8" autocomplete="new-password" [class.is-invalid]="errores()['admin_password']" />
+              <div class="form-text">Mínimo 8 caracteres. Se la pasás al club para que ingrese.</div>
+              @if (errores()['admin_password']) { <div class="campo-error">{{ errores()['admin_password'] }}</div> }
+            </div>
+          } @else {
+            <div>
+              <label class="form-label" for="aid">Número de usuario (ID)</label>
+              <input id="aid" type="number" min="1" class="form-control" name="admin" [(ngModel)]="adminExistente" required />
+              <div class="form-text">El usuario tiene que ser personal del club (staff).</div>
+            </div>
+          }
+        </section>
+      }
+
+      @if (error()) { <div class="alerta bad" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span>{{ error() }}</span></div> }
+      <div class="acciones">
+        <a class="btn btn-tool" routerLink="/admin/clubes">Cancelar</a>
+        <button type="submit" class="btn btn-primary btn-lg" [disabled]="fr.invalid || enviando()">{{ esEdicion() ? 'Guardar cambios' : 'Habilitar club' }}</button>
+      </div>
+    </form>
+  }
+</div>

@@ -1,15 +1,52 @@
-<form (ngSubmit)="onSubmit()" class="login">
-  <h2>Iniciar sesión</h2>
-  <label>
-    Usuario
-    <input name="username" [(ngModel)]="username" required autocomplete="username" />
-  </label>
-  <label>
-    Contraseña
-    <input name="password" type="password" [(ngModel)]="password" required autocomplete="current-password" />
-  </label>
-  @if (error()) {
-    <p class="error" role="alert">{{ error() }}</p>
-  }
-  <button type="submit">Entrar</button>
-</form>
+<div class="acceso">
+  <section class="acceso-hero">
+    <div class="marca" style="color:#fff">
+      <svg viewBox="0 0 32 32" aria-hidden="true" width="34" height="34">
+        <rect x="1" y="3" width="30" height="26" rx="5" fill="#1d4e9e" stroke="#fff" stroke-width="2" />
+        <line x1="16" y1="3" x2="16" y2="29" stroke="#fff" stroke-width="2" stroke-dasharray="3 2" />
+        <circle cx="23" cy="11" r="3.4" fill="#d8e32b" />
+      </svg>
+      <span>InLine Padel</span>
+    </div>
+    <div>
+      <h1>Armá el partido. La cancha queda reservada.</h1>
+      <p>Juntá los cuatro jugadores y asegurá el turno en un solo paso, sin grupos de mensajes ni llamadas al club.</p>
+    </div>
+    <svg class="cancha-fondo" viewBox="0 0 240 150" aria-hidden="true">
+      <rect x="2" y="2" width="236" height="146" rx="10" fill="#1d4e9e" stroke="#fff" stroke-width="3" />
+      <rect x="14" y="14" width="212" height="122" fill="none" stroke="#fff" stroke-width="2.5" />
+      <line x1="64" y1="14" x2="64" y2="136" stroke="#fff" stroke-width="2.5" />
+      <line x1="176" y1="14" x2="176" y2="136" stroke="#fff" stroke-width="2.5" />
+      <line x1="64" y1="75" x2="176" y2="75" stroke="#fff" stroke-width="2.5" />
+      <line x1="120" y1="6" x2="120" y2="144" stroke="#fff" stroke-width="4" stroke-dasharray="6 4" />
+      <circle cx="150" cy="45" r="9" fill="#d8e32b" />
+      <circle cx="82" cy="105" r="9" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4 3" />
+      <circle cx="82" cy="45" r="9" fill="#d8e32b" />
+      <circle cx="150" cy="105" r="9" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4 3" />
+    </svg>
+  </section>
+
+  <section class="acceso-form">
+    <form (ngSubmit)="onSubmit()" #f="ngForm">
+      <div>
+        <h2>Ingresá a tu cuenta</h2>
+        <p class="muted mb-0">Usá el usuario y la contraseña con los que te registraste.</p>
+      </div>
+      <div>
+        <label class="form-label" for="username">Usuario</label>
+        <input id="username" class="form-control" name="username" [(ngModel)]="username" required autocomplete="username" autofocus />
+      </div>
+      <div>
+        <label class="form-label" for="password">Contraseña</label>
+        <input id="password" class="form-control" name="password" type="password" [(ngModel)]="password" required autocomplete="current-password" />
+      </div>
+      @if (error()) {
+        <div class="alerta bad" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span>{{ error() }}</span></div>
+      }
+      <button type="submit" class="btn btn-primary btn-lg" [disabled]="f.invalid || enviando()">
+        {{ enviando() ? 'Ingresando…' : 'Ingresar' }}
+      </button>
+      <p class="text-center mb-0">¿Todavía no jugás con nosotros? <a routerLink="/registro">Creá tu cuenta</a></p>
+    </form>
+  </section>
+</div>

@@ -1,9 +1,69 @@
-<nav>
-  <strong>InLinePadel</strong>
-  @if (auth.isLoggedIn()) {
-    <span>{{ auth.usuarioActual()?.username }}</span>
-    <button type="button" (click)="logout()">Cerrar sesión</button>
-  }
-</nav>
+<a class="visually-hidden-focusable btn btn-ball m-2" href="#contenido">Saltar al contenido</a>
 
-<router-outlet />
+@if (auth.isLoggedIn()) {
+  <header class="topbar">
+    <div class="interior">
+      <a class="marca" [routerLink]="auth.inicio()" aria-label="InLine Padel, ir al inicio">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <rect x="1" y="3" width="30" height="26" rx="5" fill="#1d4e9e" stroke="#fff" stroke-width="2" />
+          <line x1="16" y1="3" x2="16" y2="29" stroke="#fff" stroke-width="2" stroke-dasharray="3 2" />
+          <circle cx="23" cy="11" r="3.4" fill="#d8e32b" />
+        </svg>
+        <span>InLine Padel</span>
+      </a>
+      <nav class="nav-escritorio" aria-label="Principal">
+        @for (i of menu(); track i.ruta) {
+          <a [routerLink]="i.ruta" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: !!i.exacto }">{{ i.texto }}</a>
+        }
+        @if (esJugador()) {
+          <a routerLink="/contactos" routerLinkActive="activo">Contactos</a>
+        }
+      </nav>
+      <div class="derecha">
+        @if (esJugador()) {
+          <a class="btn-top d-lg-none" routerLink="/contactos" aria-label="Contactos"><i class="bi bi-people-fill" aria-hidden="true"></i></a>
+        }
+        <a class="btn-top" routerLink="/notificaciones" [attr.aria-label]="'Avisos' + (notif.noLeidas() ? ', ' + notif.noLeidas() + ' sin leer' : '')">
+          <i class="bi bi-bell-fill" aria-hidden="true"></i>
+          @if (notif.noLeidas() > 0) { <span class="insignia">{{ notif.noLeidas() > 9 ? '9+' : notif.noLeidas() }}</span> }
+        </a>
+        <span class="d-none d-md-inline small opacity-75">{{ auth.usuarioActual()?.username }}</span>
+        <button type="button" class="btn-top" (click)="logout()" aria-label="Cerrar sesión">
+          <i class="bi bi-box-arrow-right" aria-hidden="true"></i><span class="d-none d-md-inline">Salir</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="nav-movil" aria-label="Principal">
+    @for (i of menu(); track i.ruta) {
+      <a [routerLink]="i.ruta" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: !!i.exacto }" [class.crear]="i.destacado">
+        <i class="bi" [class]="i.icono" aria-hidden="true"></i>{{ i.texto }}
+      </a>
+    }
+  </nav>
+}
+
+<main id="contenido" tabindex="-1">
+  <router-outlet />
+</main>
+
+<div class="toasts" aria-live="polite">
+  @for (a of toast.avisos(); track a.id) {
+    <div class="toast-ip" [class]="a.tipo + ' toast-ip'" role="status">
+      <i class="bi" [class]="a.tipo === 'ok' ? 'bi-check-circle-fill' : a.tipo === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-info-circle-fill'" aria-hidden="true"></i>
+      <span>{{ a.texto }}</span>
+      <button type="button" (click)="toast.cerrar(a.id)" aria-label="Cerrar aviso"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+    </div>
+  }
+</div>
+
+<app-modal [abierto]="!!confirmar.pedido()" [titulo]="confirmar.pedido()?.titulo ?? ''" (cerrar)="confirmar.responder(false)">
+  <p>{{ confirmar.pedido()?.mensaje }}</p>
+  <div class="pie-modal">
+    <button type="button" class="btn btn-tool" (click)="confirmar.responder(false)">{{ confirmar.pedido()?.cancelar ?? 'Volver' }}</button>
+    <button type="button" class="btn" [class]="confirmar.pedido()?.peligro ? 'btn btn-danger' : 'btn btn-primary'" (click)="confirmar.responder(true)">
+      {{ confirmar.pedido()?.confirmar ?? 'Confirmar' }}
+    </button>
+  </div>
+</app-modal>
