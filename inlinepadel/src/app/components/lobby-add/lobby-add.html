@@ -1,8 +1,25 @@
 <div class="crear-partida">
+  <div class="crear-intro">
+    <h2 class="h4 mb-1">Armá tu partida</h2>
+    <p class="muted mb-0">Elegí un turno libre, definí quién puede sumarse y reservá. Queda provisoria hasta completar los cuatro cupos.</p>
+  </div>
+
   <div class="crear-grid">
     <section class="panel" aria-labelledby="titulo-turnos">
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <h2 id="titulo-turnos" class="h4 mb-0">Elegí día y turno</h2>
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+        <div>
+          <h2 id="titulo-turnos" class="h4 mb-1">Elegí día y turno</h2>
+          <p class="muted small mb-0" aria-live="polite">
+            @if (cargandoTurnos()) {
+              Buscando turnos…
+            } @else if (turnos().length > 0) {
+              {{ turnos().length }} {{ turnos().length === 1 ? 'turno libre' : 'turnos libres' }}
+              en {{ canchasLibres() }} {{ canchasLibres() === 1 ? 'cancha' : 'canchas' }}
+            } @else {
+              No hay turnos libres para ese día
+            }
+          </p>
+        </div>
         <div class="dia-chips">
           <button type="button" class="btn btn-sm" [class.btn-primary]="esHoy()" [class.btn-tool]="!esHoy()" (click)="elegirDia(0)">Hoy</button>
           <button type="button" class="btn btn-sm" [class.btn-primary]="esManana()" [class.btn-tool]="!esManana()" (click)="elegirDia(1)">Mañana</button>
@@ -16,6 +33,9 @@
             (ngModelChange)="cargarTurnos()"
             aria-label="Elegir otro día"
           />
+          <button type="button" class="btn btn-tool btn-sm" (click)="cargarTurnos()" [disabled]="cargandoTurnos()" aria-label="Actualizar turnos">
+            <i class="bi bi-arrow-clockwise" [class.girar]="cargandoTurnos()" aria-hidden="true"></i>
+          </button>
         </div>
       </div>
 
@@ -26,6 +46,9 @@
           <i class="bi bi-calendar-x" aria-hidden="true"></i>
           <strong>No hay turnos libres ese día</strong>
           Probá con otro día.
+          @if (esHoy()) {
+            <div class="mt-3"><button type="button" class="btn btn-tool" (click)="elegirDia(1)">Ver mañana</button></div>
+          }
         </div>
       } @else {
         <div class="turnos-lista">
@@ -65,6 +88,7 @@
           <div><dt>Día</dt><dd>{{ t.fecha | date: 'EEEE d MMMM' }}</dd></div>
           <div><dt>Hora</dt><dd>{{ t.hora_inicio | hhmm }} · {{ t.duracion }} min</dd></div>
           <div><dt>Cancha</dt><dd>N° {{ t.cancha_numero }} · {{ t.cancha_tipo === 'TECHADA' ? 'Techada' : 'Descubierta' }}</dd></div>
+          <div><dt>Cupos</dt><dd>4 jugadores</dd></div>
           <div><dt>Precio total</dt><dd>{{ t.precio | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd></div>
           <div><dt>Tu parte</dt><dd>{{ precioPorJugador() | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd></div>
         </dl>

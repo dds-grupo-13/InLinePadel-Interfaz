@@ -138,7 +138,7 @@ export class LobbyDetails {
     if (!l || l.privacidad === p) return;
     this.lobbies.cambiarPrivacidad(l.id, p).subscribe({
       next: () => {
-        this.toast.ok(p === 'PRIVADO' ? 'Ahora es una partida de solo amigos.' : 'Ahora es una partida pública.');
+        this.toast.ok(p === 'PRIVADO' ? 'Ahora es una partida de solo invitados.' : 'Ahora es una partida pública.');
         this.cargar();
       },
       error: (e) => this.toast.error(leerError(e, 'No pudimos cambiar la privacidad.').mensaje),

@@ -2,9 +2,8 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Club, Turno } from '../../models/club.model';
+import { Turno } from '../../models/club.model';
 import { Privacidad } from '../../models/lobby.model';
-import { ClubService } from '../../services/club';
 import { LobbyService } from '../../services/lobby';
 import { ToastService } from '../../services/toast';
 import { TurnoService } from '../../services/turno';
@@ -22,13 +21,11 @@ import { agruparTurnos } from '../../utils/partidas';
 export class LobbyAdd {
   readonly clubId = input.required<number>();
 
-  private readonly clubService = inject(ClubService);
   private readonly turnoService = inject(TurnoService);
   private readonly lobbies = inject(LobbyService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
 
-  readonly club = signal<Club | null>(null);
   readonly turnos = signal<Turno[]>([]);
   readonly cargandoTurnos = signal(false);
   readonly turnoElegido = signal<Turno | null>(null);
@@ -40,19 +37,14 @@ export class LobbyAdd {
   privacidad: Privacidad = 'PUBLICO';
 
   readonly grupos = computed(() => agruparTurnos(this.turnos()));
+  readonly canchasLibres = computed(() => new Set(this.turnos().map((t) => t.cancha)).size);
   readonly precioPorJugador = computed(() => (this.turnoElegido() ? Number(this.turnoElegido()!.precio) / 4 : 0));
 
   constructor() {
     effect(() => {
       const id = this.clubId();
       if (!id) return;
-      untracked(() => {
-        this.clubService.get(id).subscribe({
-          next: (c) => this.club.set(c),
-          error: () => {},
-        });
-        this.cargarTurnos();
-      });
+      untracked(() => this.cargarTurnos());
     });
   }
 

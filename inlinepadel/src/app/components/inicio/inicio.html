@@ -1,8 +1,8 @@
 <div class="contenedor">
   <div class="cabecera">
     <div>
-      <h1>¿Dónde jugás?</h1>
-      <p>Elegí un club y sumate a una partida o creá la tuya.</p>
+      <h1>Elegí tu club</h1>
+      <p>Entrá a un club para ver las partidas abiertas y sumarte, o creá la tuya.</p>
     </div>
     <div class="accesos">
       <a class="btn btn-tool" routerLink="/mis-partidas">
@@ -15,8 +15,29 @@
     </div>
   </div>
 
+  <div class="inicio-resumen" aria-label="Resumen de partidas disponibles">
+    <div class="resumen-dato">
+      <strong>{{ totalDisponibles() }}</strong>
+      <span>{{ totalDisponibles() === 1 ? 'partida para unirte' : 'partidas para unirte' }}</span>
+    </div>
+    <div class="resumen-dato">
+      <strong>{{ totalCuposLibres() }}</strong>
+      <span>{{ totalCuposLibres() === 1 ? 'cupo libre' : 'cupos libres' }}</span>
+    </div>
+    <div class="resumen-dato">
+      <strong>{{ clubesVisibles().length }}</strong>
+      <span>{{ clubesVisibles().length === 1 ? 'club' : 'clubes' }}</span>
+    </div>
+    @if (totalInvitaciones() > 0) {
+      <span class="resumen-invitaciones">
+        <i class="bi bi-envelope-paper-fill" aria-hidden="true"></i>
+        {{ totalInvitaciones() === 1 ? 'Tenés 1 invitación' : 'Tenés ' + totalInvitaciones() + ' invitaciones' }}
+      </span>
+    }
+  </div>
+
   <div class="filtros-zona">
-    <label class="form-label mb-0" for="zona-inicio">Zona</label>
+    <label class="form-label mb-0" for="zona-inicio"><i class="bi bi-geo-alt" aria-hidden="true"></i> Zona</label>
     <select id="zona-inicio" class="form-select" [ngModel]="zona()" (ngModelChange)="zona.set($event)">
       <option [ngValue]="null">Todas</option>
       @for (z of zonas(); track z.id) { <option [ngValue]="z.id">{{ z.nombre }}</option> }
@@ -32,21 +53,50 @@
   } @else {
     <div class="clubes-grid">
       @for (c of clubesVisibles(); track c.id) {
-        <a class="club-card" [routerLink]="['/clubes', c.id]">
+        @let r = resumenDe(c);
+        <a class="club-card" [class.sin-partidas]="r.disponibles === 0" [routerLink]="['/clubes', c.id]">
           <div class="club-card-top">
             <span class="club-icono" aria-hidden="true"><i class="bi bi-buildings"></i></span>
-            @if (conteos().get(c.id); as n) {
-              <span class="cuenta-partidas">{{ n }} {{ n === 1 ? 'partida para sumarte' : 'partidas para sumarte' }}</span>
+            @if (r.disponibles > 0) {
+              <span class="cuenta-partidas">
+                <strong>{{ r.disponibles }}</strong>
+                {{ r.disponibles === 1 ? 'lobby para unirte' : 'lobbies para unirte' }}
+              </span>
             } @else {
-              <span class="cuenta-partidas sin">Sin partidas abiertas</span>
+              <span class="cuenta-partidas sin">Sin lobbies abiertos</span>
             }
           </div>
           <h2>{{ c.denominacion }}</h2>
-          <p class="muted">
+          <p class="muted club-dir">
             <i class="bi bi-geo-alt" aria-hidden="true"></i>
             {{ nombreZona(c) }} · {{ c.direccion }}
           </p>
-          <span class="club-cta">Ver partidas <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+
+          <div class="club-card-detalles">
+            @if (r.invitaciones > 0) {
+              <span class="chip-invitacion">
+                <i class="bi bi-envelope-paper-fill" aria-hidden="true"></i>
+                {{ r.invitaciones === 1 ? '1 invitación' : r.invitaciones + ' invitaciones' }}
+              </span>
+            }
+            @if (r.proximo; as p) {
+              <span class="proximo">
+                <i class="bi bi-clock" aria-hidden="true"></i>
+                Próxima: {{ etiquetaDia(p.turno_detalle.fecha) }} · {{ p.turno_detalle.hora_inicio | hhmm }}
+              </span>
+            }
+            @if (r.disponibles > 0) {
+              <span>
+                <i class="bi bi-person-check" aria-hidden="true"></i>
+                {{ r.cuposLibres }} {{ r.cuposLibres === 1 ? 'cupo libre' : 'cupos libres' }}
+              </span>
+            }
+          </div>
+
+          <span class="club-cta">
+            {{ r.disponibles > 0 ? 'Ver partidas' : 'Entrar y crear una' }}
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </span>
         </a>
       } @empty {
         <div class="vacio" style="grid-column: 1 / -1">

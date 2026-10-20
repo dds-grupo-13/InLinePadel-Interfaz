@@ -17,6 +17,41 @@ export function conteoPorClub(lobbies: Lobby[]): Map<number, number> {
   return conteo;
 }
 
+export interface ResumenClub {
+  /** Partidas abiertas a las que el jugador puede unirse. */
+  disponibles: number;
+  /** De esas partidas, cuántas tienen una invitación pendiente para el jugador. */
+  invitaciones: number;
+  cuposLibres: number;
+  proximo: Lobby | null;
+}
+
+/**
+ * Resume la oferta de cada club para las tarjetas del inicio: cantidad de
+ * lobbies unibles, invitaciones pendientes, cupos y la próxima partida.
+ */
+export function resumenPorClub(lobbies: Lobby[]): Map<number, ResumenClub> {
+  const resumen = new Map<number, ResumenClub>();
+  for (const l of lobbies) {
+    if (!sePuedeUnir(l)) continue;
+    const club = l.turno_detalle.club;
+    const actual = resumen.get(club) ?? {
+      disponibles: 0,
+      invitaciones: 0,
+      cuposLibres: 0,
+      proximo: null,
+    };
+    actual.disponibles += 1;
+    if (l.fui_invitado) actual.invitaciones += 1;
+    actual.cuposLibres += l.cupos_libres;
+    if (!actual.proximo || l.turno_detalle.inicio < actual.proximo.turno_detalle.inicio) {
+      actual.proximo = l;
+    }
+    resumen.set(club, actual);
+  }
+  return resumen;
+}
+
 /** Agrupa los lobbies por día, ordenados por fecha y hora. */
 export function agruparPorDia(lobbies: Lobby[]): { fecha: string; lobbies: Lobby[] }[] {
   const porFecha = new Map<string, Lobby[]>();

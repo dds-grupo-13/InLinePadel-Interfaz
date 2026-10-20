@@ -18,54 +18,91 @@
           {{ zona() }} · {{ c.direccion }}
         </p>
       </div>
+      <button type="button" class="btn btn-tool btn-sm" (click)="recargar()" [disabled]="actualizando()" aria-label="Actualizar partidas">
+        <i class="bi bi-arrow-clockwise" [class.girar]="actualizando()" aria-hidden="true"></i>
+        <span class="d-none d-sm-inline">Actualizar</span>
+      </button>
     </div>
 
-    <div class="segmentado" role="tablist" aria-label="Qué querés hacer en el club">
-      <button
-        type="button"
-        role="tab"
-        [attr.aria-selected]="vista() === 'unirse'"
-        [class.activo]="vista() === 'unirse'"
-        (click)="vista.set('unirse')"
-      >
-        <i class="bi bi-people" aria-hidden="true"></i> Unirse
-      </button>
-      <button
-        type="button"
-        role="tab"
-        [attr.aria-selected]="vista() === 'crear'"
-        [class.activo]="vista() === 'crear'"
-        (click)="vista.set('crear')"
-      >
-        <i class="bi bi-plus-lg" aria-hidden="true"></i> Crear
-      </button>
+    <div class="club-acciones">
+      <div class="toggle-vista" [class.crear]="vista() === 'crear'" role="tablist" aria-label="Unirse a una partida o crear una nueva">
+        <span class="toggle-indicador" aria-hidden="true"></span>
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="vista() === 'unirse'"
+          [class.activo]="vista() === 'unirse'"
+          (click)="vista.set('unirse')"
+        >
+          <i class="bi bi-people-fill" aria-hidden="true"></i> Unirse
+          @if (lobbies().length > 0) { <span class="cuenta">{{ lobbies().length }}</span> }
+        </button>
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="vista() === 'crear'"
+          [class.activo]="vista() === 'crear'"
+          (click)="vista.set('crear')"
+        >
+          <i class="bi bi-plus-lg" aria-hidden="true"></i> Crear
+        </button>
+      </div>
+
+      @if (totalInvitaciones() > 0) {
+        <span class="aviso-invitaciones">
+          <i class="bi bi-envelope-paper-fill" aria-hidden="true"></i>
+          {{ totalInvitaciones() === 1 ? 'Tenés 1 invitación' : 'Tenés ' + totalInvitaciones() + ' invitaciones' }}
+        </span>
+      }
     </div>
 
     @if (vista() === 'unirse') {
-      @if (lobbies().length === 0) {
-        <div class="vacio panel">
-          <i class="bi bi-people" aria-hidden="true"></i>
-          <strong>No hay partidas abiertas en este club</strong>
-          Podés crear la primera y esperar a que se sumen otros jugadores.
-          <div class="mt-3"><button type="button" class="btn btn-primary" (click)="irACrear()">Crear una partida</button></div>
-        </div>
-      } @else {
-        @for (grupo of porDia(); track grupo.fecha) {
-          <h2 class="dia-partidas">{{ grupo.fecha | date: 'EEEE d MMMM' }}</h2>
-          <div class="lista-partidas mb-4">
-            @for (l of grupo.lobbies; track l.id) {
-              <app-partida-card
-                [lobby]="l"
-                [accion]="true"
-                [mostrarClub]="false"
-                (unirse)="unirse($event)"
-              />
+      <section class="vista-unirse" role="tabpanel" aria-label="Partidas para unirse">
+        @if (lobbies().length === 0) {
+          <div class="vacio panel">
+            <i class="bi bi-people" aria-hidden="true"></i>
+            <strong>No hay partidas abiertas en este club</strong>
+            Podés crear la primera y esperar a que se sumen otros jugadores.
+            <div class="mt-3"><button type="button" class="btn btn-primary" (click)="irACrear()">Crear una partida</button></div>
+          </div>
+        } @else {
+          <div class="resultado-cabecera" aria-live="polite">
+            <p>
+              <strong>{{ lobbies().length }}</strong>
+              {{ lobbies().length === 1 ? 'partida abierta' : 'partidas abiertas' }}
+              · <span class="muted">{{ totalCuposLibres() }} {{ totalCuposLibres() === 1 ? 'cupo libre' : 'cupos libres' }}</span>
+            </p>
+            @if (totalInvitaciones() > 0) {
+              <span class="leyenda-invitacion">
+                <span class="marca-invitado"><i class="bi bi-envelope-paper-fill" aria-hidden="true"></i> Invitación</span>
+                Las partidas con esta marca son para vos.
+              </span>
             }
           </div>
+
+          @for (grupo of porDia(); track grupo.fecha) {
+            <div class="dia-cabecera">
+              <h2 class="dia-partidas">{{ grupo.fecha | date: 'EEEE d MMMM' }}</h2>
+              @if (etiquetaDia(grupo.fecha); as rel) { <span class="chip-dia">{{ rel }}</span> }
+              <span class="muted small">{{ grupo.lobbies.length }} {{ grupo.lobbies.length === 1 ? 'partida' : 'partidas' }}</span>
+            </div>
+            <div class="lista-partidas mb-4">
+              @for (l of grupo.lobbies; track l.id) {
+                <app-partida-card
+                  [lobby]="l"
+                  [accion]="true"
+                  [mostrarClub]="false"
+                  (unirse)="unirse($event)"
+                />
+              }
+            </div>
+          }
         }
-      }
+      </section>
     } @else {
-      <app-lobby-add [clubId]="c.id" />
+      <section role="tabpanel" aria-label="Crear una partida">
+        <app-lobby-add [clubId]="c.id" />
+      </section>
     }
   }
 </div>

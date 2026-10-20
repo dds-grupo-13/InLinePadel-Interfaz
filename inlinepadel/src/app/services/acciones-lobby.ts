@@ -50,6 +50,7 @@ export class AccionesLobby {
       if (irAlDetalle) this.router.navigate(['/partidas', l.id]);
     } catch (e) {
       this.toast.error(leerError(e, 'No pudimos sumarte a la partida.').mensaje);
+      return false;
     }
     return true;
   }
@@ -70,6 +71,7 @@ export class AccionesLobby {
       this.toast.ok('Saliste de la partida.');
     } catch (e) {
       this.toast.error(leerError(e, 'No pudimos sacarte de la partida.').mensaje);
+      return false;
     }
     return true;
   }
@@ -88,6 +90,7 @@ export class AccionesLobby {
       this.toast.ok('Cancelaste la partida. El turno quedó libre.');
     } catch (e) {
       this.toast.error(leerError(e, 'No pudimos cancelar la partida.').mensaje);
+      return false;
     }
     return true;
   }

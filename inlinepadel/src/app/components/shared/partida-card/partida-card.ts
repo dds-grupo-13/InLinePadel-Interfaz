@@ -17,24 +17,26 @@ import { Estado } from '../estado/estado';
   template: `
     @let l = lobby();
     <article class="partida" [class.mia]="esMia()" [class.invitado]="l.fui_invitado">
-      <div>
+      <div class="partida-cuerpo">
+        <div class="partida-cabecera">
+          <span class="id-partida">Partida #{{ l.id }}</span>
+          @if (l.fui_invitado) {
+            <span class="marca-invitado"><i class="bi bi-envelope-paper-fill" aria-hidden="true"></i> Invitación</span>
+          }
+        </div>
         <div class="cuando">
           <a class="stretched" [routerLink]="['/partidas', l.id]">
             {{ l.turno_detalle.fecha | date: 'EEE d MMM' }} · {{ l.turno_detalle.hora_inicio | hhmm }}
           </a>
         </div>
         <div class="donde">
-          @if (mostrarClub()) { {{ l.turno_detalle.club_nombre }} · }
-          Cancha {{ l.turno_detalle.cancha_numero }}
-          {{ l.turno_detalle.cancha_tipo === 'TECHADA' ? 'techada' : 'descubierta' }}
-          · <span class="id-partida">#{{ l.id }}</span>
+          @if (mostrarClub()) { <span>{{ l.turno_detalle.club_nombre }}</span> · }
+          <span>Cancha {{ l.turno_detalle.cancha_numero }} {{ l.turno_detalle.cancha_tipo === 'TECHADA' ? 'techada' : 'descubierta' }}</span>
+          · <span>{{ l.turno_detalle.duracion }} min</span>
         </div>
         <div class="meta">
           <span title="Capitán"><i class="bi bi-person-badge" aria-hidden="true"></i> {{ capitan() }}</span>
           <span title="Jugadores anotados"><i class="bi bi-people" aria-hidden="true"></i> {{ l.cupos_ocupados }}/4</span>
-          @if (l.fui_invitado) {
-            <span class="marca-invitado"><i class="bi bi-envelope-paper-fill" aria-hidden="true"></i> Invitado</span>
-          }
           @if (esMia()) { <span class="estado ok">Ya estás</span> }
         </div>
       </div>
@@ -54,7 +56,9 @@ import { Estado } from '../estado/estado';
         <div class="d-flex gap-3 align-items-center">
           <span class="precio">{{ l.precio_por_jugador | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }} <small class="muted fw-normal">c/u</small></span>
           @if (puedeUnirse()) {
-            <button type="button" class="btn btn-primary btn-sm" (click)="unirse.emit(l)">Unirme</button>
+            <button type="button" class="btn btn-sm" [class.btn-primary]="!l.fui_invitado" [class.btn-ball]="l.fui_invitado" (click)="unirse.emit(l)">
+              {{ textoAccion() }}
+            </button>
           }
         </div>
       </div>
@@ -72,4 +76,5 @@ export class PartidaCard {
 
   readonly capitan = computed(() => capitanDe(this.lobby()));
   readonly puedeUnirse = computed(() => this.accion() && !this.esMia() && sePuedeUnir(this.lobby()));
+  readonly textoAccion = computed(() => (this.lobby().fui_invitado ? 'Aceptar invitación' : 'Unirme'));
 }
