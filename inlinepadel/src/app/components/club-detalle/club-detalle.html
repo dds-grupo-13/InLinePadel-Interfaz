@@ -1,0 +1,71 @@
+<div class="contenedor">
+  <a routerLink="/inicio" class="volver"><i class="bi bi-arrow-left" aria-hidden="true"></i> Inicio</a>
+
+  @if (cargando()) {
+    <div class="cargando" role="status" aria-label="Cargando club"></div>
+  } @else if (error()) {
+    <div class="vacio panel">
+      <i class="bi bi-emoji-frown" aria-hidden="true"></i>
+      <strong>{{ error() }}</strong>
+      <a class="btn btn-primary mt-3" routerLink="/inicio">Volver al inicio</a>
+    </div>
+  } @else if (club(); as c) {
+    <div class="cabecera club-cabecera">
+      <div>
+        <h1>{{ c.denominacion }}</h1>
+        <p>
+          <i class="bi bi-geo-alt" aria-hidden="true"></i>
+          {{ zona() }} · {{ c.direccion }}
+        </p>
+      </div>
+    </div>
+
+    <div class="segmentado" role="tablist" aria-label="Qué querés hacer en el club">
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="vista() === 'unirse'"
+        [class.activo]="vista() === 'unirse'"
+        (click)="vista.set('unirse')"
+      >
+        <i class="bi bi-people" aria-hidden="true"></i> Unirse
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="vista() === 'crear'"
+        [class.activo]="vista() === 'crear'"
+        (click)="vista.set('crear')"
+      >
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> Crear
+      </button>
+    </div>
+
+    @if (vista() === 'unirse') {
+      @if (lobbies().length === 0) {
+        <div class="vacio panel">
+          <i class="bi bi-people" aria-hidden="true"></i>
+          <strong>No hay partidas abiertas en este club</strong>
+          Podés crear la primera y esperar a que se sumen otros jugadores.
+          <div class="mt-3"><button type="button" class="btn btn-primary" (click)="irACrear()">Crear una partida</button></div>
+        </div>
+      } @else {
+        @for (grupo of porDia(); track grupo.fecha) {
+          <h2 class="dia-partidas">{{ grupo.fecha | date: 'EEEE d MMMM' }}</h2>
+          <div class="lista-partidas mb-4">
+            @for (l of grupo.lobbies; track l.id) {
+              <app-partida-card
+                [lobby]="l"
+                [accion]="true"
+                [mostrarClub]="false"
+                (unirse)="unirse($event)"
+              />
+            }
+          </div>
+        }
+      }
+    } @else {
+      <app-lobby-add [clubId]="c.id" />
+    }
+  }
+</div>

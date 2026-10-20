@@ -260,3 +260,73 @@ dialog.modal-ip .pie-modal { display: flex; justify-content: flex-end; gap: 0.5r
 .partida a.stretched { color: inherit; text-decoration: none; }
 .partida a.stretched::after { content: ''; position: absolute; inset: 0; border-radius: var(--ip-radius); }
 .partida .btn, .partida button { position: relative; z-index: 1; }
+
+/* ===== inicio: clubes, toggle y alta de partida ===== */
+.volver { display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.9rem; text-decoration: none; font-weight: 500; }
+.accesos { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.accesos .cuenta { background: var(--ip-ball); color: #12202f; border-radius: 99px; font-size: 0.75rem; font-weight: 700; padding: 0 0.45rem; margin-left: 0.3rem; }
+.filtros-zona { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.1rem; }
+.filtros-zona .form-select { max-width: 260px; }
+.clubes-grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+@media (min-width: 768px) { .clubes-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1100px) { .clubes-grid { grid-template-columns: 1fr 1fr 1fr; } }
+.club-card { background: var(--ip-surface); border: 1px solid var(--ip-line); border-radius: var(--ip-radius); padding: 1.15rem; display: flex; flex-direction: column; gap: 0.45rem; text-decoration: none; color: inherit; transition: border-color 0.15s, transform 0.15s; }
+.club-card:hover { border-color: var(--ip-court); color: inherit; transform: translateY(-2px); }
+.club-card-top { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.club-icono { width: 40px; height: 40px; border-radius: 12px; background: var(--ip-info-bg); color: var(--ip-court); display: grid; place-items: center; font-size: 1.25rem; flex: none; }
+.club-card h2 { font-size: 1.5rem; margin: 0.15rem 0 0; }
+.club-card p { margin: 0; }
+.cuenta-partidas { font-size: 0.78rem; font-weight: 700; color: var(--ip-ok); background: var(--ip-ok-bg); padding: 0.2rem 0.55rem; border-radius: 99px; white-space: nowrap; }
+.cuenta-partidas.sin { color: var(--ip-muted); background: var(--ip-off-bg); font-weight: 600; }
+.club-cta { margin-top: auto; padding-top: 0.5rem; color: var(--ip-court); font-weight: 600; display: inline-flex; gap: 0.35rem; align-items: center; }
+
+.segmentado { display: inline-flex; background: var(--ip-surface); border: 1px solid var(--ip-line); border-radius: 12px; padding: 4px; gap: 4px; margin-bottom: 1.25rem; }
+.segmentado button { border: 0; background: transparent; color: var(--ip-muted); font-weight: 600; padding: 0.5rem 1.15rem; border-radius: 9px; display: inline-flex; align-items: center; gap: 0.4rem; }
+.segmentado button:hover:not(.activo) { background: var(--ip-info-bg); color: var(--ip-court); }
+.segmentado button.activo { background: var(--ip-court); color: #fff; }
+.club-cabecera p { display: flex; align-items: center; gap: 0.3rem; }
+.dia-partidas { font-size: 1.15rem; margin: 0.25rem 0 0.65rem; color: var(--ip-muted); text-transform: capitalize; }
+
+.partida .meta { display: flex; flex-wrap: wrap; gap: 0.35rem 0.9rem; align-items: center; color: var(--ip-muted); font-size: 0.85rem; margin-top: 0.4rem; }
+.partida .meta i { color: var(--ip-court); }
+.partida .id-partida { font-weight: 700; color: var(--ip-ink); }
+.partida.invitado { border-left: 5px solid var(--ip-ball); }
+.marca-invitado { display: inline-flex; align-items: center; gap: 0.3rem; background: var(--ip-ball); color: #12202f; border-radius: 99px; padding: 0.1rem 0.55rem; font-size: 0.78rem; font-weight: 700; }
+
+.crear-grid { display: grid; gap: 1rem; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 992px) { .crear-grid { grid-template-columns: 1.55fr 1fr; } }
+.crear-partida .panel h2 { font-size: 1.25rem; }
+.dia-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.dia-chips input[type='date'] { max-width: 165px; }
+.turnos-lista { display: grid; gap: 0.15rem; max-height: 540px; overflow-y: auto; padding-right: 0.25rem; }
+.turno-grupo { display: grid; grid-template-columns: 82px 1fr; gap: 0.75rem; align-items: start; padding: 0.65rem 0; border-top: 1px solid var(--ip-line); }
+.turno-grupo:first-child { border-top: 0; padding-top: 0; }
+.turno-hora strong { font-family: 'Barlow Semi Condensed', sans-serif; font-size: 1.4rem; display: block; line-height: 1.05; }
+.turno-hora small { color: var(--ip-muted); }
+.canchas { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.cancha-chip { border: 1.5px solid var(--ip-line); background: var(--ip-surface); color: var(--ip-ink); border-radius: 12px; padding: 0.45rem 0.7rem; display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2; min-width: 118px; text-align: left; }
+.cancha-chip:hover { border-color: var(--ip-court); }
+.cancha-chip small { color: var(--ip-muted); font-size: 0.75rem; }
+.cancha-chip .precio { font-weight: 700; font-size: 0.85rem; margin-top: 0.2rem; }
+.cancha-chip.elegida { background: var(--ip-court); border-color: var(--ip-court); color: #fff; }
+.cancha-chip.elegida small { color: rgba(255, 255, 255, 0.85); }
+@media (min-width: 992px) { .resumen-crear { position: sticky; top: 80px; } }
+.resumen-crear.bloqueado { opacity: 0.8; }
+.opciones-privacidad { display: grid; grid-template-columns: 1fr; gap: 0.5rem; border: 0; padding: 0; margin: 0; }
+.opciones-privacidad legend { float: none; width: auto; }
+.opcion-privacidad { border: 1.5px solid var(--ip-line); border-radius: 10px; padding: 0.55rem 0.75rem; cursor: pointer; display: block; }
+.opcion-privacidad input { position: absolute; opacity: 0; }
+.opcion-privacidad span { display: flex; flex-direction: column; }
+.opcion-privacidad small { color: var(--ip-muted); font-size: 0.8rem; }
+.opcion-privacidad:has(input:checked) { border-color: var(--ip-court); background: var(--ip-info-bg); }
+.opcion-privacidad:has(input:checked) strong { color: var(--ip-court); }
+.opcion-privacidad:has(input:focus-visible) { outline: 3px solid var(--ip-ball); }
+.opciones-privacidad:disabled .opcion-privacidad { cursor: not-allowed; }
+
+@media (max-width: 575px) {
+  .turno-grupo { grid-template-columns: 1fr; gap: 0.3rem; }
+  .turno-hora { display: flex; align-items: baseline; gap: 0.4rem; }
+  .turno-hora strong { font-size: 1.2rem; }
+  .filtros-zona { align-items: flex-start; flex-direction: column; }
+  .filtros-zona .form-select { max-width: none; width: 100%; }
+}

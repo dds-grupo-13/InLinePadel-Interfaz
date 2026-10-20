@@ -55,7 +55,7 @@ export class AuthService {
   /** Pantalla de inicio de cada rol. */
   inicio(): string {
     const rol = this.rol();
-    return rol === 'sistema' ? '/admin/clubes' : rol === 'club' ? '/club' : '/partidas';
+    return rol === 'sistema' ? '/admin/clubes' : rol === 'club' ? '/club' : '/inicio';
   }
 
   /** Guarda el perfil actualizado (ej: tras editar el perfil propio). */

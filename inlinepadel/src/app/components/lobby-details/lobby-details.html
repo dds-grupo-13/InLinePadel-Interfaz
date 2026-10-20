@@ -1,5 +1,5 @@
 <div class="contenedor">
-  <a routerLink="/partidas" class="d-inline-block mb-3"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a las partidas</a>
+  <a [routerLink]="volverA()" class="d-inline-block mb-3"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al club</a>
 
   @if (cargando()) {
     <div class="cargando" role="status" aria-label="Cargando partida"></div>
@@ -7,7 +7,7 @@
     <div class="vacio panel">
       <i class="bi bi-emoji-frown" aria-hidden="true"></i>
       <strong>{{ error() }}</strong>
-      <a class="btn btn-primary mt-3" routerLink="/partidas">Ver otras partidas</a>
+      <a class="btn btn-primary mt-3" routerLink="/inicio">Ver otros clubes</a>
     </div>
   } @else if (lobby(); as l) {
     <div class="cabecera">
@@ -54,33 +54,14 @@
                 <button type="button" class="btn btn-primary" (click)="responderInvitacion(true)" [disabled]="ocupado()">Aceptar invitación</button>
                 <button type="button" class="btn btn-tool" (click)="responderInvitacion(false)" [disabled]="ocupado()">Rechazar</button>
               </div>
-            } @else if (miSolicitud()) {
-              <div class="alerta info"><i class="bi bi-hourglass-split" aria-hidden="true"></i><span>Ya pediste acceso. Cuando el capitán responda te avisamos.</span></div>
             } @else if (abierta() && l.cupos_libres > 0) {
               <button type="button" class="btn btn-primary btn-lg" (click)="unirse()" [disabled]="ocupado()">
-                {{ l.privacidad === 'PRIVADO' ? 'Pedir acceso al capitán' : 'Unirme a la partida' }}
+                Unirme a la partida
               </button>
               <span class="muted ms-2">Tu parte: {{ l.precio_por_jugador | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
             } @else {
               <div class="alerta warn"><i class="bi bi-info-circle" aria-hidden="true"></i><span>Esta partida ya no tiene lugares disponibles.</span></div>
             }
-          </section>
-        }
-
-        @if (solicitudes().length) {
-          <section class="panel" aria-label="Pedidos de acceso">
-            <h3>Quieren sumarse</h3>
-            <ul class="list-unstyled d-grid gap-2 mb-0">
-              @for (s of solicitudes(); track s.id) {
-                <li class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                  <strong><app-jugador-nombre [id]="s.jugador" /></strong>
-                  <span class="acciones">
-                    <button type="button" class="btn btn-primary btn-sm" (click)="responderSolicitud(s, true)" [disabled]="ocupado()">Aceptar</button>
-                    <button type="button" class="btn btn-tool btn-sm" (click)="responderSolicitud(s, false)" [disabled]="ocupado()">Rechazar</button>
-                  </span>
-                </li>
-              }
-            </ul>
           </section>
         }
 

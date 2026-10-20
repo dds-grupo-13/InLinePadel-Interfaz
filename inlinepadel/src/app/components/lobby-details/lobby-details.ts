@@ -5,7 +5,7 @@ import { Observable, catchError, forkJoin, of } from 'rxjs';
 import { Club, Zona } from '../../models/club.model';
 import { etiquetaPosicion, JugadorPublico } from '../../models/jugador.model';
 import { Lobby, Privacidad } from '../../models/lobby.model';
-import { Invitacion, SolicitudAcceso } from '../../models/social.model';
+import { Invitacion } from '../../models/social.model';
 import { AccionesLobby } from '../../services/acciones-lobby';
 import { AuthService } from '../../services/auth';
 import { ClubService } from '../../services/club';
@@ -52,8 +52,6 @@ export class LobbyDetails {
   readonly error = signal<string | null>(null);
   readonly ocupado = signal(false);
 
-  readonly solicitudes = signal<SolicitudAcceso[]>([]);
-  readonly miSolicitud = signal(false);
   readonly miInvitacion = signal<Invitacion | null>(null);
   readonly invitacionesEnviadas = signal<Invitacion[]>([]);
 
@@ -67,6 +65,10 @@ export class LobbyDetails {
   readonly inscripto = computed(() => !!this.lobby()?.inscripciones.some((i) => i.jugador.id === this.miId()));
   readonly abierta = computed(() => this.lobby()?.estado === 'EN_FORMACION');
   readonly vigente = computed(() => ['EN_FORMACION', 'COMPLETO'].includes(this.lobby()?.estado ?? ''));
+  readonly volverA = computed(() => {
+    const l = this.lobby();
+    return l ? ['/clubes', l.turno_detalle.club] : ['/inicio'];
+  });
   readonly puestos = computed<Puesto[]>(() => {
     const l = this.lobby();
     return [1, 2, 3, 4].map((cupo) => ({ cupo, jugador: l?.inscripciones.find((i) => i.numero_cupo === cupo)?.jugador ?? null }));
@@ -95,7 +97,7 @@ export class LobbyDetails {
         this.cargando.set(false);
         this.error.set(
           leerError(e, 'No pudimos cargar la partida.').status === 404
-            ? 'Esta partida ya no está disponible. Puede que se haya cancelado o completado.'
+            ? 'Esta partida es solo por invitación o ya no está disponible.'
             : leerError(e).mensaje,
         );
       },
@@ -113,12 +115,9 @@ export class LobbyDetails {
     const inscripto = l.inscripciones.some((i) => i.jugador.id === this.miId());
     const vacio = <T>(o: Observable<T[]>) => o.pipe(catchError(() => of([] as T[])));
     forkJoin({
-      pendientes: vacio(this.social.solicitudes({ lobby: l.id, estado: 'PENDIENTE' })),
       recibidas: inscripto ? of([] as Invitacion[]) : vacio(this.social.invitaciones({ lobby: l.id, rol: 'recibidas', estado: 'PENDIENTE' })),
       enviadas: inscripto ? vacio(this.social.invitaciones({ lobby: l.id, rol: 'enviadas' })) : of([] as Invitacion[]),
     }).subscribe((r) => {
-      this.solicitudes.set(l.es_capitan ? r.pendientes : []);
-      this.miSolicitud.set(!inscripto && r.pendientes.some((s) => s.jugador === this.miId()));
       this.miInvitacion.set(r.recibidas[0] ?? null);
       this.invitacionesEnviadas.set(r.enviadas);
     });
@@ -160,24 +159,6 @@ export class LobbyDetails {
       },
       error: (e) => {
         this.toast.error(leerError(e, 'No pudimos responder la invitación.').mensaje);
-        this.ocupado.set(false);
-        this.cargar();
-      },
-    });
-  }
-
-  // --- solicitudes de acceso (capitán) ---
-  responderSolicitud(s: SolicitudAcceso, aceptar: boolean): void {
-    this.ocupado.set(true);
-    const op = aceptar ? this.social.aceptarSolicitud(s.id) : this.social.rechazarSolicitud(s.id);
-    op.subscribe({
-      next: () => {
-        this.toast.ok(aceptar ? 'Aceptaste el pedido: el jugador ya está en la partida.' : 'Rechazaste el pedido.');
-        this.ocupado.set(false);
-        this.cargar();
-      },
-      error: (e) => {
-        this.toast.error(leerError(e, 'No pudimos responder el pedido.').mensaje);
         this.ocupado.set(false);
         this.cargar();
       },

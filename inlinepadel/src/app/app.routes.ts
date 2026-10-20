@@ -12,8 +12,10 @@ export const routes: Routes = [
     path: '',
     canActivate: [rolGuard('jugador')],
     children: [
-      { path: 'partidas', loadComponent: () => import('./components/lobby-list/lobby-list').then((m) => m.LobbyList), title: 'Partidas · InLine Padel' },
-      { path: 'partidas/nueva', loadComponent: () => import('./components/lobby-add/lobby-add').then((m) => m.LobbyAdd), title: 'Crear partida · InLine Padel' },
+      { path: 'inicio', loadComponent: () => import('./components/inicio/inicio').then((m) => m.Inicio), title: 'Inicio · InLine Padel' },
+      { path: 'clubes/:id', loadComponent: () => import('./components/club-detalle/club-detalle').then((m) => m.ClubDetalle), title: 'Club · InLine Padel' },
+      { path: 'partidas', redirectTo: '/inicio', pathMatch: 'full' },
+      { path: 'partidas/nueva', redirectTo: '/inicio', pathMatch: 'full' },
       { path: 'partidas/:id', loadComponent: () => import('./components/lobby-details/lobby-details').then((m) => m.LobbyDetails), title: 'Partida · InLine Padel' },
       { path: 'mis-partidas', loadComponent: () => import('./components/mis-partidas/mis-partidas').then((m) => m.MisPartidas), title: 'Mis partidas · InLine Padel' },
       { path: 'contactos', loadComponent: () => import('./components/contactos/contactos').then((m) => m.Contactos), title: 'Contactos · InLine Padel' },

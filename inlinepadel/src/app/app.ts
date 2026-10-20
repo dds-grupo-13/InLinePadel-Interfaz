@@ -15,10 +15,8 @@ interface Item {
 }
 
 const JUGADOR: Item[] = [
-  { ruta: '/partidas', texto: 'Partidas', icono: 'bi-search', exacto: true },
-  { ruta: '/mis-partidas', texto: 'Mis partidas', icono: 'bi-calendar-check' },
-  { ruta: '/partidas/nueva', texto: 'Crear', icono: 'bi-plus-lg', destacado: true },
-  { ruta: '/pedidos', texto: 'Invitaciones', icono: 'bi-envelope-paper' },
+  { ruta: '/inicio', texto: 'Inicio', icono: 'bi-house-door', exacto: true },
+  { ruta: '/contactos', texto: 'Contactos', icono: 'bi-people' },
   { ruta: '/perfil', texto: 'Perfil', icono: 'bi-person-circle' },
 ];
 const CLUB: Item[] = [
@@ -53,8 +51,6 @@ export class App {
       default: return [];
     }
   });
-  protected readonly esJugador = computed(() => this.auth.rol() === 'jugador');
-
   constructor() {
     // los avisos sin leer se consultan al entrar y cada minuto (límite de la API: 100 pedidos/min)
     effect((onCleanup) => {

@@ -20,14 +20,6 @@ export interface Invitacion {
   fecha: string;
 }
 
-export interface SolicitudAcceso {
-  id: number;
-  lobby: number;
-  jugador: number;
-  estado: EstadoPedido;
-  fecha: string;
-}
-
 export interface Notificacion {
   id: number;
   mensaje: string;
