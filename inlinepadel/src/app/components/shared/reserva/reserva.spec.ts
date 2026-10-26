@@ -26,6 +26,14 @@ describe('Reserva', () => {
     expect(fixture.nativeElement.textContent).not.toContain('Presentalo');
   });
 
+  it('una reserva cancelada no muestra el código ni pide presentarlo', () => {
+    const fixture = TestBed.createComponent(Reserva);
+    fixture.componentRef.setInput('lobby', { estado_reserva: null, mensaje_reserva: 'Partida cancelada por el club: Lluvia', codigo_reserva: 'ABCD-1234' });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).not.toContain('ABCD-1234');
+    expect(fixture.nativeElement.textContent).not.toContain('Presentalo');
+  });
+
   it('mantiene las clases de las otras reservas', () => {
     expect(pintar('CONFIRMADA').classList).toContain('confirmada');
     expect(pintar('PROVISORIA').classList).toContain('provisoria');
