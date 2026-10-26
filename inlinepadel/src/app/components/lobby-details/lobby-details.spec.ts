@@ -146,3 +146,27 @@ describe('LobbyDetails — invitación recibida según el tipo', () => {
     expect(botones(el)).toContain('Aceptar invitación');
   });
 });
+
+describe('LobbyDetails — avisos de cierre y textos', () => {
+  const ajena = (extra: Partial<Lobby> = {}) => lobby({ estado: 'COMPLETO', inscripciones: [], puede_abandonar: false, aviso_cierre: null, ...extra });
+  const cesion = { invitaciones: () => of([invitacion({ tipo: 'CESION', reemplaza: 7 })]) };
+
+  it('un no inscripto sin aviso no ve ninguna alerta de cierre', () => {
+    const el: HTMLElement = montar(ajena()).nativeElement;
+    expect(el.querySelector('.alerta .bi-lock-fill, .alerta .bi-clock-history')).toBeNull();
+  });
+
+  it('el receptor de una cesión ve el aviso de reserva firme junto a los botones, una sola vez', () => {
+    const aviso = 'Si aceptás, la reserva ya es firme: no vas a poder bajarte.';
+    const el: HTMLElement = montar(ajena({ reserva_firme: true, aviso_cierre: aviso }), cesion).nativeElement;
+    const acciones = el.querySelector('section[aria-label="Acciones"]')!;
+    expect(acciones.textContent).toContain(aviso);
+    expect(el.textContent!.split(aviso)).toHaveLength(2);
+  });
+
+  it('no promete que el turno se libera solo y dice hasta cuándo hay plazo', () => {
+    const el: HTMLElement = montar(lobby({ plazo_limite: '2026-10-21T10:00:00-03:00' })).nativeElement;
+    expect(el.textContent).not.toContain('libera solo');
+    expect(el.textContent).toContain('Tienen hasta el');
+  });
+});

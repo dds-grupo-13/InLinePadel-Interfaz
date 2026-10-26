@@ -25,7 +25,7 @@
     <div class="row g-4">
       <div class="col-lg-7 d-grid gap-3 align-content-start">
         <app-reserva [lobby]="l" />
-        @if (l.aviso_cierre; as aviso) {
+        @if (!recibeCesion() && l.aviso_cierre; as aviso) {
           <div class="alerta" [class.warn]="l.reserva_firme" [class.info]="!l.reserva_firme" role="status">
             <i class="bi" [class.bi-lock-fill]="l.reserva_firme" [class.bi-clock-history]="!l.reserva_firme" aria-hidden="true"></i>
             <span>{{ aviso }}</span>
@@ -72,6 +72,9 @@
             } @else if (miInvitacion(); as inv) {
               @if (inv.tipo === 'CESION') {
                 <p class="mb-2"><strong><app-jugador-nombre [id]="inv.emisor" /></strong> te ofrece su lugar en esta partida (reserva confirmada). Tu parte es {{ l.precio_por_jugador | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}.</p>
+                @if (l.aviso_cierre) {
+                  <div class="alerta warn mb-2" role="status"><i class="bi bi-lock-fill" aria-hidden="true"></i><span>{{ l.aviso_cierre }}</span></div>
+                }
               } @else {
                 <p class="mb-2"><strong><app-jugador-nombre [id]="inv.emisor" /></strong> te invitó a esta partida.</p>
               }
@@ -98,11 +101,11 @@
             <div><dt>Precio total</dt><dd>{{ l.precio_total | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd></div>
             <div><dt>Por jugador</dt><dd>{{ l.precio_por_jugador | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd></div>
             @if (club(); as c) { <div><dt>Dirección</dt><dd>{{ c.direccion }}</dd></div> }
-            @if (l.estado === 'EN_FORMACION') {
-              <div><dt>Plazo para completar</dt><dd>{{ l.plazo_limite | date: 'EEE d/M, HH:mm' }}</dd></div>
-            }
           </dl>
-          <p class="muted small mt-3 mb-0">El alquiler se paga en el mostrador del club. Si no se completan los cuatro cupos antes del plazo, el turno se libera solo.</p>
+          <p class="muted small mt-3 mb-0">
+            @if (l.estado === 'EN_FORMACION') { Tienen hasta el {{ l.plazo_limite | date: 'EEE d/M, HH:mm' }} para completar los cuatro cupos. }
+            El alquiler se paga en el mostrador del club.
+          </p>
         </section>
       </div>
 

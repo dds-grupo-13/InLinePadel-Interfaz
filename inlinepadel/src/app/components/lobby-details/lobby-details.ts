@@ -66,6 +66,7 @@ export class LobbyDetails {
 
   protected readonly miId = computed(() => this.auth.usuarioActual()?.id ?? 0);
   readonly inscripto = computed(() => !!this.lobby()?.inscripciones.some((i) => i.jugador.id === this.miId()));
+  readonly recibeCesion = computed(() => !this.inscripto() && this.miInvitacion()?.tipo === 'CESION');
   readonly abierta = computed(() => this.lobby()?.estado === 'EN_FORMACION');
   readonly vigente = computed(() => ['EN_FORMACION', 'COMPLETO'].includes(this.lobby()?.estado ?? ''));
   readonly volverA = computed(() => {
