@@ -349,3 +349,21 @@ dialog.modal-ip .pie-modal { display: flex; justify-content: flex-end; gap: 0.5r
   .partida { grid-template-columns: 1fr; }
   .partida app-cupos { justify-self: end; }
 }
+
+.filtros-partidas { margin-bottom: 1.1rem; }
+.filtros-toggle { display: none; }
+.filtros-cuerpo { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; align-items: flex-end; }
+.filtro-grupo { display: grid; gap: 0.25rem; }
+.filtro-grupo .form-label { margin: 0; font-size: 0.85rem; }
+.filtro-grupo .franja { display: flex; align-items: center; gap: 0.4rem; }
+.filtro-grupo .franja input { width: 110px; }
+.filtro-grupo .input-group { max-width: 170px; }
+.filtros-toggle .cuenta { background: var(--ip-ball); color: #12202f; border-radius: 99px; font-size: 0.72rem; padding: 0 0.45rem; margin-left: 0.35rem; font-weight: 700; }
+@media (max-width: 575px) {
+  .filtros-toggle { display: inline-flex; align-items: center; gap: 0.35rem; }
+  .filtros-cuerpo { display: none; flex-direction: column; align-items: stretch; margin-top: 0.75rem; gap: 0.75rem; }
+  .filtros-cuerpo.abierto { display: flex; }
+  .filtro-grupo .input-group { max-width: none; }
+  .filtro-grupo .franja input { flex: 1; width: auto; min-width: 0; }
+  .filtro-grupo .dia-chips input[type='date'] { flex: 1; max-width: none; min-width: 0; }
+}

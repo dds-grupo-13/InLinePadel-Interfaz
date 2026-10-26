@@ -42,7 +42,25 @@ export interface LobbyFiltros {
   hora_hasta?: string | null;
   precio_max?: number | null;
   privacidad?: Privacidad | '' | null;
-  estado?: EstadoLobby | '' | null;
+  estado?: EstadoLobby | EstadoLobby[] | '' | null;
   con_cupos?: boolean | null;
   mios?: boolean | null;
+  orden?: 'inicio' | '-inicio' | null;
+}
+
+export type FiltrosBusqueda = Pick<LobbyFiltros, 'fecha' | 'hora_desde' | 'hora_hasta' | 'precio_max'>;
+
+export interface ProximoLobby {
+  id: number;
+  fecha: string;
+  hora_inicio: string;
+  inicio: string;
+}
+
+export interface ResumenClubApi {
+  club: number;
+  disponibles: number;
+  cupos_libres: number;
+  invitaciones: number;
+  proximo: ProximoLobby | null;
 }

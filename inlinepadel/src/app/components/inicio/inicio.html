@@ -36,6 +36,8 @@
     }
   </div>
 
+  <app-filtros-partidas [valor]="filtros()" (cambio)="filtrar($event)" />
+
   <div class="filtros-zona">
     <label class="form-label mb-0" for="zona-inicio"><i class="bi bi-geo-alt" aria-hidden="true"></i> Zona</label>
     <select id="zona-inicio" class="form-select" [ngModel]="zona()" (ngModelChange)="zona.set($event)">
@@ -82,7 +84,7 @@
             @if (r.proximo; as p) {
               <span class="proximo">
                 <i class="bi bi-clock" aria-hidden="true"></i>
-                Próxima: {{ etiquetaDia(p.turno_detalle.fecha) }} · {{ p.turno_detalle.hora_inicio | hhmm }}
+                Próxima: {{ etiquetaDia(p.fecha) }} · {{ p.hora_inicio | hhmm }}
               </span>
             }
             @if (r.disponibles > 0) {

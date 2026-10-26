@@ -35,6 +35,25 @@ describe('LobbyService', () => {
     expect(req.request.body).toEqual({ codigo_reserva: 'ABCD-1234' });
   });
 
+  it('el resumen por club manda los filtros al endpoint sin paginar', () => {
+    service.resumenPorClub({ zona: 2, fecha: '2026-10-20', hora_desde: '18:00', precio_max: 12000, club: null }).subscribe();
+    const req = http.expectOne((r) => r.url === `${url}resumen_por_club/`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('zona')).toBe('2');
+    expect(req.request.params.get('fecha')).toBe('2026-10-20');
+    expect(req.request.params.get('hora_desde')).toBe('18:00');
+    expect(req.request.params.get('precio_max')).toBe('12000');
+    expect(req.request.params.has('club')).toBe(false);
+    expect(req.request.params.has('page')).toBe(false);
+  });
+
+  it('el listado repite el estado cuando se piden varios', () => {
+    service.getAll({ mios: true, estado: ['JUGADO', 'CANCELADO'], orden: '-inicio' }, 1).subscribe();
+    const req = http.expectOne((r) => r.url === url);
+    expect(req.request.params.getAll('estado')).toEqual(['JUGADO', 'CANCELADO']);
+    expect(req.request.params.get('orden')).toBe('-inicio');
+  });
+
   it('el listado manda la página y omite filtros vacíos', () => {
     service.getAll({}, 2).subscribe();
     const req = http.expectOne((r) => r.url === url);

@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Service, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Lobby, LobbyFiltros, Privacidad } from '../models/lobby.model';
+import { Lobby, LobbyFiltros, Privacidad, ResumenClubApi } from '../models/lobby.model';
 import { Page } from '../models/page.model';
-import { aParams, traerTodas } from '../utils/http';
+import { aParams } from '../utils/http';
 
 @Service()
 export class LobbyService {
@@ -15,8 +15,8 @@ export class LobbyService {
     return this.http.get<Page<Lobby>>(this.url, { params: aParams({ ...filtros, page }) });
   }
 
-  todos(filtros: LobbyFiltros): Observable<Lobby[]> {
-    return traerTodas<Lobby>(this.http, this.url, filtros);
+  resumenPorClub(filtros: LobbyFiltros = {}): Observable<ResumenClubApi[]> {
+    return this.http.get<ResumenClubApi[]>(`${this.url}resumen_por_club/`, { params: aParams(filtros) });
   }
 
   get(id: number): Observable<Lobby> {
