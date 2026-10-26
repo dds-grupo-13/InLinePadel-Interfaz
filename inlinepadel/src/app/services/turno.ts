@@ -39,6 +39,10 @@ export class TurnoService {
     return this.http.post<Turno>(`${this.url}${id}/no_disponible/`, {});
   }
 
+  cancelarPorClub(id: number, motivo: string): Observable<Turno> {
+    return this.http.post<Turno>(`${this.url}${id}/cancelar_por_club/`, { motivo });
+  }
+
   disponible(id: number): Observable<Turno> {
     return this.http.post<Turno>(`${this.url}${id}/disponible/`, {});
   }
