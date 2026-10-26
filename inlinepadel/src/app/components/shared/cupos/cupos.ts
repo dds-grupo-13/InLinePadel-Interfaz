@@ -3,11 +3,10 @@ import { Inscripcion } from '../../../models/lobby.model';
 import { iniciales } from '../../../utils/fechas';
 
 const POS = [
-  { x: 30, y: 27 }, { x: 30, y: 57 }, // lado izquierdo de la red
-  { x: 90, y: 27 }, { x: 90, y: 57 }, // lado derecho
+  { x: 30, y: 27 }, { x: 30, y: 57 },
+  { x: 90, y: 27 }, { x: 90, y: 57 },
 ];
 
-/** La cancha vista desde arriba con los cuatro cupos: ocupados llenos, libres punteados. */
 @Component({
   selector: 'app-cupos',
   template: `
@@ -29,7 +28,6 @@ const POS = [
   `,
 })
 export class Cupos {
-  /** Con la lista se pueden mostrar las iniciales; si no, alcanza con la cantidad. */
   readonly inscripciones = input<Inscripcion[] | null>(null);
   readonly ocupados = input<number>(0);
   readonly ancho = input<number>(120);

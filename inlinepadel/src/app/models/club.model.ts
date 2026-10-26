@@ -13,7 +13,6 @@ export interface Club {
   direccion: string;
   estado: EstadoClub;
   zona: number;
-  /** Solo lo ve el personal del sistema. */
   admin?: number | null;
 }
 

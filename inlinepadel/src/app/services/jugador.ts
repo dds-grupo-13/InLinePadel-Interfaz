@@ -19,12 +19,10 @@ export class JugadorService {
   private readonly url = `${environment.apiUrl}/usuarios/jugadores/`;
   private readonly cache = new Map<number, Observable<JugadorPublico | null>>();
 
-  /** Alta pública de jugador (no requiere sesión). */
   registrar(datos: RegistroDatos): Observable<Jugador> {
     return this.http.post<Jugador>(this.url, datos);
   }
 
-  /** Perfil propio completo (devuelve el mismo formato que el login). */
   miPerfil(): Observable<Usuario> {
     return this.http.get<Usuario>(`${this.url}me/`);
   }
@@ -41,10 +39,6 @@ export class JugadorService {
     return this.http.get<Page<JugadorPublico>>(this.url, { params: aParams({ ...filtros, q, page }) });
   }
 
-  /**
-   * Datos públicos de un jugador por id, con caché. Si ya no existe o no está
-   * activo devuelve null para que la pantalla muestre un nombre alternativo.
-   */
   obtener(id: number): Observable<JugadorPublico | null> {
     let j = this.cache.get(id);
     if (!j) {

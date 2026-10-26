@@ -2,18 +2,18 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { invitadoGuard, inicioGuard, rolGuard } from './guards/rol.guard';
 
-// Cada pantalla se carga cuando se la visita: el bundle inicial queda liviano (RNF04).
 export const routes: Routes = [
   { path: 'login', canActivate: [invitadoGuard], loadComponent: () => import('./components/login/login').then((m) => m.Login), title: 'Ingresar · InLine Padel' },
   { path: 'registro', canActivate: [invitadoGuard], loadComponent: () => import('./components/registro/registro').then((m) => m.Registro), title: 'Crear cuenta · InLine Padel' },
 
-  // jugador
   {
     path: '',
     canActivate: [rolGuard('jugador')],
     children: [
-      { path: 'partidas', loadComponent: () => import('./components/lobby-list/lobby-list').then((m) => m.LobbyList), title: 'Partidas · InLine Padel' },
-      { path: 'partidas/nueva', loadComponent: () => import('./components/lobby-add/lobby-add').then((m) => m.LobbyAdd), title: 'Crear partida · InLine Padel' },
+      { path: 'inicio', loadComponent: () => import('./components/inicio/inicio').then((m) => m.Inicio), title: 'Inicio · InLine Padel' },
+      { path: 'clubes/:id', loadComponent: () => import('./components/club-detalle/club-detalle').then((m) => m.ClubDetalle), title: 'Club · InLine Padel' },
+      { path: 'partidas', redirectTo: '/inicio', pathMatch: 'full' },
+      { path: 'partidas/nueva', redirectTo: '/inicio', pathMatch: 'full' },
       { path: 'partidas/:id', loadComponent: () => import('./components/lobby-details/lobby-details').then((m) => m.LobbyDetails), title: 'Partida · InLine Padel' },
       { path: 'mis-partidas', loadComponent: () => import('./components/mis-partidas/mis-partidas').then((m) => m.MisPartidas), title: 'Mis partidas · InLine Padel' },
       { path: 'contactos', loadComponent: () => import('./components/contactos/contactos').then((m) => m.Contactos), title: 'Contactos · InLine Padel' },
@@ -22,7 +22,6 @@ export const routes: Routes = [
     ],
   },
 
-  // administrador de club
   {
     path: 'club',
     canActivate: [rolGuard('club')],
@@ -36,7 +35,6 @@ export const routes: Routes = [
     ],
   },
 
-  // administrador del sistema
   {
     path: 'admin',
     canActivate: [rolGuard('sistema')],
@@ -48,7 +46,6 @@ export const routes: Routes = [
     ],
   },
 
-  // cualquier usuario con sesión
   { path: 'notificaciones', canActivate: [authGuard], loadComponent: () => import('./components/notificaciones/notificaciones').then((m) => m.Notificaciones), title: 'Avisos · InLine Padel' },
 
   { path: '', pathMatch: 'full', canActivate: [inicioGuard], children: [] },

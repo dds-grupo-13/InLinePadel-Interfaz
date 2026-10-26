@@ -8,7 +8,6 @@ export interface PedidoConfirmacion {
   peligro?: boolean;
 }
 
-/** Diálogo de confirmación para acciones que no se pueden deshacer. */
 @Service()
 export class ConfirmarService {
   readonly pedido = signal<PedidoConfirmacion | null>(null);

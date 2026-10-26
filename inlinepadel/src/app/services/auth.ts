@@ -9,8 +9,6 @@ const ACCESS_KEY = 'access';
 const REFRESH_KEY = 'refresh';
 const USUARIO_KEY = 'usuario';
 
-// Los tokens se guardan en localStorage: es legible por cualquier script de la página,
-// por lo que un XSS podría robarlos. Por eso no se usa innerHTML ni bypassSecurityTrust*.
 function leer(clave: string): string | null {
   try {
     return localStorage.getItem(clave);
@@ -26,9 +24,7 @@ function escribir(clave: string, valor: string | null): void {
     } else {
       localStorage.setItem(clave, valor);
     }
-  } catch {
-    // storage no disponible: la sesión dura solo hasta recargar
-  }
+  } catch {}
 }
 
 @Service()
@@ -43,7 +39,6 @@ export class AuthService {
   readonly usuarioActual = this._usuario.asReadonly();
   readonly isLoggedIn = this._logueado.asReadonly();
 
-  /** Rol que decide qué pantallas se ofrecen: sistema > club > jugador. */
   readonly rol = computed<Rol | null>(() => {
     const u = this._usuario();
     if (!u) return null;
@@ -52,13 +47,11 @@ export class AuthService {
     return 'jugador';
   });
 
-  /** Pantalla de inicio de cada rol. */
   inicio(): string {
     const rol = this.rol();
-    return rol === 'sistema' ? '/admin/clubes' : rol === 'club' ? '/club' : '/partidas';
+    return rol === 'sistema' ? '/admin/clubes' : rol === 'club' ? '/club' : '/inicio';
   }
 
-  /** Guarda el perfil actualizado (ej: tras editar el perfil propio). */
   actualizarUsuario(usuario: Usuario): void {
     escribir(USUARIO_KEY, JSON.stringify(usuario));
     this._usuario.set(usuario);
@@ -87,13 +80,11 @@ export class AuthService {
   logout(): void {
     const refresh = this.getRefreshToken();
     if (refresh) {
-      // el backend invalida el refresh; si falla igual se cierra la sesión local
       this.http.post(`${this.url}/logout/`, { refresh }).subscribe({ error: () => {} });
     }
     this.limpiar();
   }
 
-  /** Cierra la sesión local sin avisar al backend (refresh ya inválido) y va a /login. */
   expulsar(): void {
     this.limpiar();
     this.router.navigate(['/login']);

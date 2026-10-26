@@ -16,12 +16,10 @@ export class ClubService {
     return this.http.get<Page<Club>>(this.url, { params: aParams(filtros) });
   }
 
-  /** Todos los clubes visibles para el usuario (recorre las páginas). */
   todos(filtros: { zona?: number | null; estado?: EstadoClub | '' | null } = {}): Observable<Club[]> {
     return traerTodas<Club>(this.http, this.url, filtros);
   }
 
-  /** Detalle con caché (el listado de partidas repite los mismos clubes). */
   get(id: number): Observable<Club> {
     let c = this.cacheClub.get(id);
     if (!c) {
@@ -55,7 +53,6 @@ export class ClubService {
     return this.http.post<Club>(`${this.url}${id}/dar_de_baja/`, {});
   }
 
-  /** Ocupación de un club por franja horaria (vista del administrador de club). */
   ocupacion(id: number, filtros: { fecha?: string; fecha_desde?: string; fecha_hasta?: string }): Observable<TurnoOcupacion[]> {
     return traerTodas<TurnoOcupacion>(this.http, `${this.url}${id}/ocupacion/`, filtros);
   }

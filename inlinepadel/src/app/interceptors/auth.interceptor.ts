@@ -4,7 +4,6 @@ import { Observable, ReplaySubject, catchError, finalize, switchMap, throwError 
 import { environment } from '../../environments/environment';
 import { AuthService } from '../services/auth';
 
-// refresh en curso, compartido para que varias requests con 401 hagan un solo refresh
 let refrescando: ReplaySubject<string> | null = null;
 
 const esApi = (url: string) => url.startsWith(environment.apiUrl);

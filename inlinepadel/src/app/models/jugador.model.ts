@@ -9,7 +9,6 @@ export const POSICIONES: { valor: Posicion; etiqueta: string }[] = [
 export const etiquetaPosicion = (p: string | null | undefined): string =>
   POSICIONES.find((x) => x.valor === p)?.etiqueta ?? '';
 
-/** Datos de cuenta tal como los devuelve/recibe la API (UsuarioSerializer). */
 export interface DatosUsuario {
   id?: number;
   username: string;
@@ -20,14 +19,12 @@ export interface DatosUsuario {
   password_actual?: string;
 }
 
-/** Perfil propio del jugador (RegistroJugadorSerializer). */
 export interface Jugador {
   usuario: DatosUsuario;
   posicion: Posicion;
   zona: number | null;
 }
 
-/** Datos mínimos de un tercero (JugadorPublicoSerializer). */
 export interface JugadorPublico {
   id: number;
   username: string;

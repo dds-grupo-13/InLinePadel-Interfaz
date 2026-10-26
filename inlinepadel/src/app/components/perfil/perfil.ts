@@ -30,15 +30,13 @@ export class Perfil implements OnInit {
   readonly cambiandoClave = signal(false);
   readonly erroresClave = signal<Record<string, string>>({});
 
-  username = this.auth.usuarioActual()?.username ?? '';
-  f = { first_name: '', last_name: '', email: '' };
+  f = { username: this.auth.usuarioActual()?.username ?? '', first_name: '', last_name: '', email: '' };
   posicion: Posicion = 'INDISTINTO';
   zona: number | null = null;
   clave = { password_actual: '', password: '', repetir: '' };
 
   ngOnInit(): void {
     this.zonaService.getAll().subscribe({ next: (z) => this.zonas.set(z), error: () => {} });
-    // el perfil guardado puede estar desactualizado: se vuelve a pedir
     this.jugadores.miPerfil().subscribe({
       next: (u) => {
         this.auth.actualizarUsuario(u);
@@ -51,7 +49,7 @@ export class Perfil implements OnInit {
   private cargarForm(): void {
     const j = this.auth.usuarioActual()?.jugador;
     if (!j) return;
-    this.f = { first_name: j.usuario.first_name ?? '', last_name: j.usuario.last_name ?? '', email: j.usuario.email ?? '' };
+    this.f = { username: j.usuario.username ?? this.f.username, first_name: j.usuario.first_name ?? '', last_name: j.usuario.last_name ?? '', email: j.usuario.email ?? '' };
     this.posicion = j.posicion;
     this.zona = j.zona;
   }

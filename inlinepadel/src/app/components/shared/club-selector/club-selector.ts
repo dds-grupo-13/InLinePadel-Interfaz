@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { ClubActual } from '../../../services/club-actual';
 
-/** Selector de club, visible solo si el administrador tiene más de uno. */
 @Component({
   selector: 'app-club-selector',
   template: `

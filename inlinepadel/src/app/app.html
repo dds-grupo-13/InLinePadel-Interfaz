@@ -15,14 +15,8 @@
         @for (i of menu(); track i.ruta) {
           <a [routerLink]="i.ruta" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: !!i.exacto }">{{ i.texto }}</a>
         }
-        @if (esJugador()) {
-          <a routerLink="/contactos" routerLinkActive="activo">Contactos</a>
-        }
       </nav>
       <div class="derecha">
-        @if (esJugador()) {
-          <a class="btn-top d-lg-none" routerLink="/contactos" aria-label="Contactos"><i class="bi bi-people-fill" aria-hidden="true"></i></a>
-        }
         <a class="btn-top" routerLink="/notificaciones" [attr.aria-label]="'Avisos' + (notif.noLeidas() ? ', ' + notif.noLeidas() + ' sin leer' : '')">
           <i class="bi bi-bell-fill" aria-hidden="true"></i>
           @if (notif.noLeidas() > 0) { <span class="insignia">{{ notif.noLeidas() > 9 ? '9+' : notif.noLeidas() }}</span> }

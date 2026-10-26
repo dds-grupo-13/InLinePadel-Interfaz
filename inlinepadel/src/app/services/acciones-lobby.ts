@@ -9,11 +9,6 @@ import { ConfirmarService } from './confirmar';
 import { LobbyService } from './lobby';
 import { ToastService } from './toast';
 
-/**
- * Acciones sobre una partida que se repiten en el listado y en el detalle:
- * piden confirmación, llaman a la API y avisan el resultado en lenguaje natural.
- * Devuelven true si algo cambió y la pantalla debe recargarse.
- */
 @Service()
 export class AccionesLobby {
   private readonly api = inject(LobbyService);
@@ -30,29 +25,27 @@ export class AccionesLobby {
   }
 
   async unirse(l: Lobby, irAlDetalle = true): Promise<boolean> {
-    const privado = l.privacidad === 'PRIVADO' && !l.es_capitan;
+    const invitado = l.privacidad === 'PRIVADO' && l.fui_invitado;
     const precio = this.moneda.transform(l.precio_por_jugador, 'ARS', 'symbol-narrow', '1.0-0');
     const ok = await this.confirmar.pedirConfirmacion({
-      titulo: privado ? 'Pedir acceso a la partida' : 'Sumarte a la partida',
-      mensaje: privado
-        ? `${this.resumen(l)}. Es una partida de solo amigos: el capitán tiene que aceptar tu pedido.`
+      titulo: invitado ? 'Aceptar la invitación' : 'Sumarte a la partida',
+      mensaje: invitado
+        ? `${this.resumen(l)}. Tenés una invitación para esta partida privada. Tu parte es ${precio} y se paga en el club.`
         : `${this.resumen(l)}. Tu parte es ${precio} y se paga en el club.`,
-      confirmar: privado ? 'Pedir acceso' : 'Unirme',
+      confirmar: invitado ? 'Aceptar invitación' : 'Unirme',
     });
     if (!ok) return false;
     try {
       const r = await firstValueFrom(this.api.unirse(l.id));
-      if (r.solicitud) {
-        this.toast.ok('Le avisamos al capitán. Te contamos cuando responda.');
-      } else if (r.lobby!.estado === 'COMPLETO') {
-        this.toast.ok(`¡Partida completa! Reserva confirmada${r.lobby!.codigo_reserva ? ' — código ' + r.lobby!.codigo_reserva : ''}.`);
-        if (irAlDetalle) this.router.navigate(['/partidas', l.id]);
+      if (r.estado === 'COMPLETO') {
+        this.toast.ok(`¡Partida completa! Reserva confirmada${r.codigo_reserva ? ' — código ' + r.codigo_reserva : ''}.`);
       } else {
         this.toast.ok('Ya sos parte de la partida.');
-        if (irAlDetalle) this.router.navigate(['/partidas', l.id]);
       }
+      if (irAlDetalle) this.router.navigate(['/partidas', l.id]);
     } catch (e) {
       this.toast.error(leerError(e, 'No pudimos sumarte a la partida.').mensaje);
+      return false;
     }
     return true;
   }
@@ -73,6 +66,7 @@ export class AccionesLobby {
       this.toast.ok('Saliste de la partida.');
     } catch (e) {
       this.toast.error(leerError(e, 'No pudimos sacarte de la partida.').mensaje);
+      return false;
     }
     return true;
   }
@@ -91,6 +85,7 @@ export class AccionesLobby {
       this.toast.ok('Cancelaste la partida. El turno quedó libre.');
     } catch (e) {
       this.toast.error(leerError(e, 'No pudimos cancelar la partida.').mensaje);
+      return false;
     }
     return true;
   }

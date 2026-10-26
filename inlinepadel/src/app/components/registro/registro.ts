@@ -47,7 +47,6 @@ export class Registro implements OnInit {
     const { repetir, ...usuario } = this.f;
     this.jugadores.registrar({ usuario: { ...usuario, username: usuario.username.trim() }, posicion: this.posicion, zona: this.zona }).subscribe({
       next: () =>
-        // entra directo con las credenciales recién creadas
         this.auth.login(usuario.username.trim(), usuario.password).subscribe({
           next: () => {
             this.toast.ok('¡Bienvenido a InLine Padel! Ya podés buscar o armar tu primera partida.');

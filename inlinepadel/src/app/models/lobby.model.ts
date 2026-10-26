@@ -21,6 +21,7 @@ export interface Lobby {
   fecha_check_in: string;
   capitan: number;
   es_capitan: boolean;
+  fui_invitado: boolean;
   turno: number;
   turno_detalle: Turno;
   inscripciones: Inscripcion[];

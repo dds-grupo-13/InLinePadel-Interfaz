@@ -1,8 +1,3 @@
-# Despliegue local: un contenedor por nodo del diagrama de despliegue.
-# Espera los repos como carpetas hermanas: ./InLinePadel-Interfaz (este) y ../InLinePadel (backend).
-#
-#   Navegador ──► web (nginx, :4200)    SPA Angular estática
-#   Navegador ──► app (gunicorn, :8000) API REST/JSON ──SQL──► db (PostgreSQL)
 services:
   db:
     image: postgres:17
@@ -29,7 +24,6 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-inline_local}
       DB_HOST: db
       DB_PORT: "5432"
-      # origen desde el que el navegador carga la SPA (CORS)
       CORS_ALLOWED_ORIGINS: http://localhost:4200
     ports:
       - "8000:8000"

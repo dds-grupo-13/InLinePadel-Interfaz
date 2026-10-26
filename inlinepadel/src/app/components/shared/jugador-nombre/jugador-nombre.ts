@@ -4,7 +4,6 @@ import { of, switchMap } from 'rxjs';
 import { AuthService } from '../../../services/auth';
 import { JugadorService } from '../../../services/jugador';
 
-/** Muestra el nombre de un jugador a partir de su id (la API social solo devuelve ids). */
 @Component({
   selector: 'app-jugador-nombre',
   template: `{{ texto() }}`,
