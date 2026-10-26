@@ -60,19 +60,22 @@ export class LobbyAdd {
     this.cargarTurnos();
   }
 
-  cargarTurnos(): void {
+  cargarTurnos(conservarError = false): void {
+    const elegido = conservarError ? this.turnoElegido() : null;
     this.turnoElegido.set(null);
     this.turnos.set([]);
-    this.error.set(null);
+    if (!conservarError) this.error.set(null);
     if (!this.fecha) return;
     this.cargandoTurnos.set(true);
     this.turnoService.buscar({ club: this.clubId(), fecha: this.fecha }).subscribe({
       next: (t) => {
         this.turnos.set(t);
+        if (elegido && t.some((x) => x.id === elegido.id)) this.turnoElegido.set(elegido);
         this.cargandoTurnos.set(false);
       },
       error: (e) => {
         this.cargandoTurnos.set(false);
+        if (conservarError) return;
         this.error.set(leerError(e, 'No pudimos cargar los turnos.').mensaje);
       },
     });
@@ -92,7 +95,7 @@ export class LobbyAdd {
         this.enviando.set(false);
         const r = leerError(e, 'No pudimos crear la partida.');
         this.error.set(r.mensaje);
-        if (r.status === 409) this.cargarTurnos();
+        if (r.status === 409) this.cargarTurnos(true);
       },
     });
   }
