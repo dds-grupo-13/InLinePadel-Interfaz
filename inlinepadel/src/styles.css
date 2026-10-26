@@ -125,6 +125,7 @@ a { text-underline-offset: 3px; }
 .reserva .texto { font-weight: 600; font-size: 1.05rem; }
 .reserva.provisoria { background: var(--ip-warn-bg); color: var(--ip-warn); border-color: color-mix(in srgb, var(--ip-warn) 30%, transparent); }
 .reserva.confirmada { background: var(--ip-ok-bg); color: var(--ip-ok); border-color: color-mix(in srgb, var(--ip-ok) 30%, transparent); }
+.reserva.cumplida { background: var(--ip-info-bg); color: var(--ip-info); border-color: color-mix(in srgb, var(--ip-info) 30%, transparent); }
 .reserva.cancelada { background: var(--ip-off-bg); color: var(--ip-off); }
 .codigo { font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 2rem; letter-spacing: 0.12em; line-height: 1; display: inline-flex; align-items: center; gap: 0.75rem; margin-top: 0.4rem; background: var(--ip-surface); color: var(--ip-ink); padding: 0.35rem 0.8rem; border-radius: 10px; border: 2px dashed currentColor; }
 

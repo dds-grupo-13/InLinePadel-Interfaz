@@ -27,11 +27,11 @@ export class Reserva {
 
   protected readonly clase = computed(() => {
     const e = this.lobby().estado_reserva;
-    return e === 'CONFIRMADA' ? 'confirmada' : e === 'PROVISORIA' ? 'provisoria' : 'cancelada';
+    return e === 'CONFIRMADA' ? 'confirmada' : e === 'PROVISORIA' ? 'provisoria' : e === 'CUMPLIDA' ? 'cumplida' : 'cancelada';
   });
   protected readonly icono = computed(() => {
     const e = this.lobby().estado_reserva;
-    return e === 'CONFIRMADA' ? 'bi-patch-check-fill' : e === 'PROVISORIA' ? 'bi-hourglass-split' : 'bi-x-circle';
+    return e === 'CONFIRMADA' ? 'bi-patch-check-fill' : e === 'PROVISORIA' ? 'bi-hourglass-split' : e === 'CUMPLIDA' ? 'bi-check2-all' : 'bi-x-circle';
   });
 
   protected async copiar(codigo: string): Promise<void> {

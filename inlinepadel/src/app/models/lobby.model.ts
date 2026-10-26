@@ -29,7 +29,7 @@ export interface Lobby {
   cupos_libres: number;
   precio_total: string;
   precio_por_jugador: string;
-  estado_reserva: 'PROVISORIA' | 'CONFIRMADA' | null;
+  estado_reserva: 'PROVISORIA' | 'CONFIRMADA' | 'CUMPLIDA' | null;
   mensaje_reserva: string;
   codigo_reserva: string | null;
 }
