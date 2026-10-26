@@ -24,6 +24,7 @@ export class AccionesLobby {
     return `${t.club_nombre}, ${cuando}`;
   }
 
+  /** Devuelve `true` si hay que refrescar: se unió, o la partida cambió o dejó de ser visible (409/404). */
   async unirse(l: Lobby, irAlDetalle = true): Promise<boolean> {
     const invitado = l.privacidad === 'PRIVADO' && l.fui_invitado;
     const precio = this.moneda.transform(l.precio_por_jugador, 'ARS', 'symbol-narrow', '1.0-0');
@@ -44,8 +45,10 @@ export class AccionesLobby {
       }
       if (irAlDetalle) this.router.navigate(['/partidas', l.id]);
     } catch (e) {
-      this.toast.error(leerError(e, 'No pudimos sumarte a la partida.').mensaje);
-      return false;
+      const err = leerError(e, 'No pudimos sumarte a la partida.');
+      const cambio = err.status === 409 || err.status === 404;
+      this.toast.error(err.status === 404 ? 'Esta partida es solo por invitación o ya no existe.' : err.mensaje);
+      return cambio;
     }
     return true;
   }
