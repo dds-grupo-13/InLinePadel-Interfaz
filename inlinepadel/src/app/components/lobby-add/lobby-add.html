@@ -96,6 +96,13 @@
         <p class="muted">Elegí un turno de la izquierda para ver el resumen y confirmar.</p>
       }
 
+      @if (ultimoMomento()) {
+        <div class="alerta warn mb-3" role="status">
+          <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+          <span><strong>Partida de último momento:</strong> cuando se complete, la reserva queda firme y nadie va a poder bajarse.</span>
+        </div>
+      }
+
       <fieldset class="opciones-privacidad mb-3" [disabled]="!turnoElegido() || enviando()">
         <legend class="form-label">¿Quién puede sumarse?</legend>
         <label class="opcion-privacidad">

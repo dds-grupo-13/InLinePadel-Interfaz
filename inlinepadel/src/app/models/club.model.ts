@@ -44,6 +44,7 @@ export interface Turno {
   cancha: number;
   inicio: string;
   fin: string;
+  cierre: string;
   club: number;
   club_nombre: string;
   cancha_numero: number;

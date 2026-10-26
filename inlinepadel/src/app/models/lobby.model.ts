@@ -3,6 +3,7 @@ import { Turno } from './club.model';
 
 export type EstadoLobby = 'EN_FORMACION' | 'COMPLETO' | 'JUGADO' | 'CANCELADO';
 export type Privacidad = 'PUBLICO' | 'PRIVADO';
+export type CanceladaPor = 'CAPITAN' | 'ABANDONO' | 'VENCIMIENTO' | 'CLUB' | 'SISTEMA';
 
 export interface Inscripcion {
   id: number;
@@ -32,6 +33,15 @@ export interface Lobby {
   estado_reserva: 'PROVISORIA' | 'CONFIRMADA' | 'CUMPLIDA' | null;
   mensaje_reserva: string;
   codigo_reserva: string | null;
+  cierre: string;
+  reserva_firme: boolean;
+  puede_cancelar: boolean;
+  puede_abandonar: boolean;
+  puede_ceder: boolean;
+  aviso_cierre: string | null;
+  cancelada_por: CanceladaPor | null;
+  motivo_cancelacion: string;
+  cesion_pendiente: { id: number; receptor: number } | null;
 }
 
 export interface LobbyFiltros {

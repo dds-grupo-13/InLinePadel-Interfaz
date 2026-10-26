@@ -55,7 +55,7 @@ export class AccionesLobby {
     const ok = await this.confirmar.pedirConfirmacion({
       titulo: 'Salir de la partida',
       mensaje: confirmada
-        ? `${this.resumen(l)}. La reserva ya estaba confirmada: al salir, el cupo queda libre, la reserva vuelve a ser provisoria y el código deja de valer.`
+        ? `${this.resumen(l)}. La reserva ya estaba confirmada: al salir, el cupo queda libre, la reserva vuelve a ser provisoria, el código deja de valer y se le avisa al club.${l.aviso_cierre ? ' ' + l.aviso_cierre : ''}`
         : `${this.resumen(l)}. Tu cupo queda libre para otro jugador.`,
       confirmar: 'Salir de la partida',
       peligro: true,

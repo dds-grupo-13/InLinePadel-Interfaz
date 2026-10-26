@@ -4,6 +4,7 @@ import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { describe, expect, it, vi } from 'vitest';
 import { Turno } from '../../models/club.model';
+import { turno as turnoDePrueba } from '../../testing/datos';
 import { LobbyService } from '../../services/lobby';
 import { TurnoService } from '../../services/turno';
 import { LobbyAdd } from './lobby-add';
@@ -52,5 +53,21 @@ describe('LobbyAdd', () => {
 
     expect(buscar).toHaveBeenCalledTimes(1);
     expect(componente.error()).toBe('Dato inválido.');
+  });
+
+  it('avisa que es una partida de último momento cuando el cierre del turno ya pasó', () => {
+    const pasado = new Date(Date.now() - 60_000).toISOString();
+    const { fixture, componente } = montar([[turnoDePrueba({ id: 1, cierre: pasado })]], () => of({}));
+    componente.turnoElegido.set(turnoDePrueba({ id: 1, cierre: pasado }));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Partida de último momento');
+  });
+
+  it('no avisa nada si el cierre todavía no llegó', () => {
+    const futuro = new Date(Date.now() + 3_600_000).toISOString();
+    const { fixture, componente } = montar([[turnoDePrueba({ id: 1, cierre: futuro })]], () => of({}));
+    componente.turnoElegido.set(turnoDePrueba({ id: 1, cierre: futuro }));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).not.toContain('Partida de último momento');
   });
 });

@@ -16,6 +16,8 @@ export interface Invitacion {
   receptor: number;
   estado: EstadoPedido;
   fecha: string;
+  tipo: 'INVITACION' | 'CESION';
+  reemplaza: number | null;
 }
 
 export interface Notificacion {

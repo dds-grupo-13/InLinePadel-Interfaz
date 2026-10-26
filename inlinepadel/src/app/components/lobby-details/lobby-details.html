@@ -25,6 +25,15 @@
     <div class="row g-4">
       <div class="col-lg-7 d-grid gap-3 align-content-start">
         <app-reserva [lobby]="l" />
+        @if (l.aviso_cierre; as aviso) {
+          <div class="alerta" [class.warn]="l.reserva_firme" [class.info]="!l.reserva_firme" role="status">
+            <i class="bi" [class.bi-lock-fill]="l.reserva_firme" [class.bi-clock-history]="!l.reserva_firme" aria-hidden="true"></i>
+            <span>{{ aviso }}</span>
+          </div>
+        }
+        @if (l.estado === 'CANCELADO' && l.motivo_cancelacion && !l.mensaje_reserva.includes(l.motivo_cancelacion)) {
+          <div class="alerta bad" role="status"><i class="bi bi-info-circle" aria-hidden="true"></i><span>Motivo: {{ l.motivo_cancelacion }}</span></div>
+        }
 
         @if (vigente()) {
           <section class="panel" aria-label="Acciones">
@@ -33,8 +42,10 @@
                 @if (abierta() && l.cupos_libres > 0) {
                   <button type="button" class="btn btn-primary" (click)="abrirInvitar()" [disabled]="ocupado()"><i class="bi bi-person-plus" aria-hidden="true"></i> Invitar amigos</button>
                 }
-                <button type="button" class="btn btn-outline-danger" (click)="abandonar()" [disabled]="ocupado()">Salir de la partida</button>
-                @if (l.es_capitan) {
+                @if (l.puede_abandonar) {
+                  <button type="button" class="btn btn-outline-danger" (click)="abandonar()" [disabled]="ocupado()">Salir de la partida</button>
+                }
+                @if (l.puede_cancelar) {
                   <button type="button" class="btn btn-outline-danger" (click)="cancelar()" [disabled]="ocupado()">Cancelar partida</button>
                 }
               </div>
