@@ -15,7 +15,9 @@ import { Lobby } from '../../../models/lobby.model';
               <i class="bi bi-clipboard" aria-hidden="true"></i> {{ copiado() ? 'Copiado' : 'Copiar' }}
             </button>
           </div>
-          <div class="small mt-2">Presentalo en el club al llegar. El pago se hace en el mostrador.</div>
+          @if (lobby().estado_reserva !== 'CUMPLIDA') {
+            <div class="small mt-2">Presentalo en el club al llegar. El pago se hace en el mostrador.</div>
+          }
         }
       </div>
     </div>

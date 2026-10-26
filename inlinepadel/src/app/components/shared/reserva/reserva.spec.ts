@@ -19,6 +19,13 @@ describe('Reserva', () => {
     expect(el.querySelector('i')!.classList).toContain('bi-check2-all');
   });
 
+  it('la reserva cumplida ya no pide presentar el código en el club', () => {
+    const fixture = TestBed.createComponent(Reserva);
+    fixture.componentRef.setInput('lobby', { estado_reserva: 'CUMPLIDA', mensaje_reserva: 'Jugado', codigo_reserva: 'CHK-1' });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).not.toContain('Presentalo');
+  });
+
   it('mantiene las clases de las otras reservas', () => {
     expect(pintar('CONFIRMADA').classList).toContain('confirmada');
     expect(pintar('PROVISORIA').classList).toContain('provisoria');
