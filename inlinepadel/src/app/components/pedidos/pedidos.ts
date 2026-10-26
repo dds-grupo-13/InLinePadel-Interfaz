@@ -1,8 +1,9 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { Invitacion } from '../../models/social.model';
+import { LobbyService } from '../../services/lobby';
 import { SocialService } from '../../services/social';
 import { ToastService } from '../../services/toast';
 import { leerError } from '../../utils/errores';
@@ -20,6 +21,7 @@ type Pestana = 'recibidas' | 'enviadas';
 export class Pedidos implements OnInit {
   private readonly social = inject(SocialService);
   private readonly toast = inject(ToastService);
+  private readonly lobbies = inject(LobbyService);
 
   readonly recibidas = signal<Invitacion[]>([]);
   readonly enviadas = signal<Invitacion[]>([]);
@@ -51,11 +53,11 @@ export class Pedidos implements OnInit {
     });
   }
 
-  private ejecutar(op: Observable<unknown>, ok: string, fallo: string): void {
+  private ejecutar<T>(op: Observable<T>, ok: string | ((r: T) => string), fallo: string): void {
     this.ocupado.set(true);
     op.subscribe({
-      next: () => {
-        this.toast.ok(ok);
+      next: (r) => {
+        this.toast.ok(typeof ok === 'string' ? ok : ok(r));
         this.ocupado.set(false);
         this.cargar();
       },
@@ -68,9 +70,22 @@ export class Pedidos implements OnInit {
   }
 
   aceptarInvitacion(i: Invitacion): void {
+    if (i.tipo === 'CESION') {
+      const tomar = this.social.aceptarInvitacion(i.id).pipe(
+        switchMap(() => this.lobbies.get(i.lobby).pipe(catchError(() => of(null)))),
+        map((l) => l?.codigo_reserva ?? null),
+      );
+      this.ejecutar(
+        tomar,
+        (codigo) => `Tomaste el lugar: la reserva está confirmada${codigo ? ' — código ' + codigo : ''}.`,
+        'No pudimos aceptar el lugar.',
+      );
+      return;
+    }
     this.ejecutar(this.social.aceptarInvitacion(i.id), 'Aceptaste la invitación: ya sos parte de la partida.', 'No pudimos aceptar la invitación.');
   }
   rechazarInvitacion(i: Invitacion): void {
-    this.ejecutar(this.social.rechazarInvitacion(i.id), 'Rechazaste la invitación.', 'No pudimos rechazar la invitación.');
+    const cesion = i.tipo === 'CESION';
+    this.ejecutar(this.social.rechazarInvitacion(i.id), cesion ? 'Rechazaste el lugar.' : 'Rechazaste la invitación.', cesion ? 'No pudimos rechazar el lugar.' : 'No pudimos rechazar la invitación.');
   }
 }

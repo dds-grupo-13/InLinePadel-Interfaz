@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { Lobby } from '../../models/lobby.model';
 import { Invitacion } from '../../models/social.model';
 import { AccionesLobby } from '../../services/acciones-lobby';
@@ -79,4 +79,70 @@ describe('LobbyDetails — acciones según los flags del backend', () => {
 
 export const invitacion = (extra: Partial<Invitacion> = {}): Invitacion => ({
   id: 9, lobby: 1, emisor: 7, receptor: 1, estado: 'PENDIENTE', fecha: '2026-10-20T10:00:00', tipo: 'INVITACION', reemplaza: null, ...extra,
+});
+
+const contactos = [7, 8].map((id) => ({ id, jugador: 1, contacto: id, estado: 'ACEPTADO', fecha: '' }));
+const firme = (extra: Partial<Lobby> = {}) =>
+  lobby({ estado: 'COMPLETO', reserva_firme: true, puede_abandonar: false, puede_cancelar: false, puede_ceder: true, codigo_reserva: 'ABCD-1234', ...extra });
+
+describe('LobbyDetails — ceder el lugar', () => {
+  it('muestra Ceder mi lugar y la pista de que es la única salida en una reserva firme', () => {
+    const el: HTMLElement = montar(firme()).nativeElement;
+    expect(botones(el).some((t) => t.includes('Ceder mi lugar'))).toBe(true);
+    expect(el.textContent).toContain('¿No podés ir? Cedé tu lugar a un contacto.');
+  });
+
+  it('no muestra el botón si el backend no habilita la cesión', () => {
+    const el: HTMLElement = montar(firme({ puede_ceder: false })).nativeElement;
+    expect(botones(el).some((t) => t.includes('Ceder mi lugar'))).toBe(false);
+  });
+
+  it('el modal deja elegir un solo contacto y ofrece el lugar a ese', () => {
+    const ceder = vi.fn().mockReturnValue(of({}));
+    const fixture = montar(firme(), { contactos: () => of(contactos) }, { ceder });
+    const c = fixture.componentInstance;
+    c.abrirCeder();
+    fixture.detectChanges();
+    const radios = fixture.nativeElement.querySelectorAll('input[name="receptor-cesion"]');
+    expect(radios).toHaveLength(2);
+    radios[0].click();
+    radios[1].click();
+    fixture.detectChanges();
+    expect(c.receptorCesion()).toBe(8);
+    expect([...radios].filter((r: HTMLInputElement) => r.checked)).toHaveLength(1);
+    c.confirmarCesion();
+    expect(ceder).toHaveBeenCalledWith(1, 8);
+  });
+
+  it('no deja confirmar la cesión sin elegir a alguien', () => {
+    const ceder = vi.fn();
+    const fixture = montar(firme(), { contactos: () => of(contactos) }, { ceder });
+    fixture.componentInstance.abrirCeder();
+    fixture.componentInstance.confirmarCesion();
+    expect(ceder).not.toHaveBeenCalled();
+  });
+
+  it('con una cesión pendiente muestra que espera respuesta en vez del botón', () => {
+    const el: HTMLElement = montar(firme({ puede_ceder: false, cesion_pendiente: { id: 5, receptor: 7 } })).nativeElement;
+    expect(el.textContent).toContain('Ofreciste tu lugar a');
+    expect(el.textContent).toContain('esperando respuesta');
+    expect(botones(el).some((t) => t.includes('Ceder mi lugar'))).toBe(false);
+  });
+});
+
+describe('LobbyDetails — invitación recibida según el tipo', () => {
+  const recibida = (tipo: 'INVITACION' | 'CESION') => ({ invitaciones: () => of([invitacion({ tipo, reemplaza: tipo === 'CESION' ? 7 : null })]) });
+  const ajena = (extra: Partial<Lobby> = {}) => lobby({ estado: 'COMPLETO', inscripciones: [], puede_abandonar: false, ...extra });
+
+  it('una cesión ofrece tomar el lugar con la reserva confirmada', () => {
+    const el: HTMLElement = montar(ajena(), recibida('CESION')).nativeElement;
+    expect(el.textContent).toContain('te ofrece su lugar en esta partida (reserva confirmada)');
+    expect(botones(el)).toContain('Aceptar y tomar el lugar');
+  });
+
+  it('una invitación común mantiene su texto', () => {
+    const el: HTMLElement = montar(ajena({ estado: 'EN_FORMACION', privacidad: 'PRIVADO' }), recibida('INVITACION')).nativeElement;
+    expect(el.textContent).toContain('te invitó a esta partida');
+    expect(botones(el)).toContain('Aceptar invitación');
+  });
 });

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Lobby, LobbyFiltros, Privacidad, ResumenClubApi } from '../models/lobby.model';
 import { Page } from '../models/page.model';
+import { Invitacion } from '../models/social.model';
 import { aParams } from '../utils/http';
 
 @Service()
@@ -33,6 +34,10 @@ export class LobbyService {
 
   unirse(id: number): Observable<Lobby> {
     return this.http.post<Lobby>(`${this.url}${id}/unirse/`, {});
+  }
+
+  ceder(id: number, receptor: number): Observable<Invitacion> {
+    return this.http.post<Invitacion>(`${this.url}${id}/ceder/`, { receptor });
   }
 
   abandonar(id: number): Observable<unknown> {
