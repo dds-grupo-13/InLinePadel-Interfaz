@@ -7,10 +7,6 @@ import { capitanDe, sePuedeUnir } from '../../../utils/partidas';
 import { Cupos } from '../cupos/cupos';
 import { Estado } from '../estado/estado';
 
-/**
- * Resumen de una partida: día y hora, cancha, capitán y ocupación.
- * La acción de unirse solo aparece si la partida está abierta y el jugador puede entrar.
- */
 @Component({
   imports: [RouterLink, DatePipe, CurrencyPipe, HhmmPipe, Cupos, Estado],
   selector: 'app-partida-card',
@@ -25,7 +21,7 @@ import { Estado } from '../estado/estado';
           }
         </div>
         <div class="cuando">
-          <a class="stretched" [routerLink]="['/partidas', l.id]">
+          <a class="stretched" [routerLink]="['/partidas', l.id]" [queryParams]="origen() ? { desde: origen() } : null">
             {{ l.turno_detalle.fecha | date: 'EEE d MMM' }} · {{ l.turno_detalle.hora_inicio | hhmm }}
           </a>
         </div>
@@ -67,11 +63,10 @@ import { Estado } from '../estado/estado';
 })
 export class PartidaCard {
   readonly lobby = input.required<Lobby>();
-  /** Muestra el nombre del club (se oculta dentro de la página del club). */
   readonly mostrarClub = input<boolean>(true);
-  /** Muestra el botón para unirse directo desde la tarjeta (2 pasos: botón + confirmar). */
   readonly accion = input<boolean>(false);
   readonly esMia = input<boolean>(false);
+  readonly origen = input<string | null>(null);
   readonly unirse = output<Lobby>();
 
   readonly capitan = computed(() => capitanDe(this.lobby()));

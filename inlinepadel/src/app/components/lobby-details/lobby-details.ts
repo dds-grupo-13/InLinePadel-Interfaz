@@ -35,6 +35,7 @@ interface Puesto {
 })
 export class LobbyDetails {
   readonly id = input.required<string>();
+  readonly desde = input<string>();
 
   private readonly lobbies = inject(LobbyService);
   private readonly clubService = inject(ClubService);
@@ -55,7 +56,6 @@ export class LobbyDetails {
   readonly miInvitacion = signal<Invitacion | null>(null);
   readonly invitacionesEnviadas = signal<Invitacion[]>([]);
 
-  // invitar amigos
   readonly invitarAbierto = signal(false);
   readonly cargandoContactos = signal(false);
   readonly contactos = signal<JugadorPublico[]>([]);
@@ -66,9 +66,11 @@ export class LobbyDetails {
   readonly abierta = computed(() => this.lobby()?.estado === 'EN_FORMACION');
   readonly vigente = computed(() => ['EN_FORMACION', 'COMPLETO'].includes(this.lobby()?.estado ?? ''));
   readonly volverA = computed(() => {
+    if (this.desde() === 'mis-partidas') return ['/mis-partidas'];
     const l = this.lobby();
     return l ? ['/clubes', l.turno_detalle.club] : ['/inicio'];
   });
+  readonly textoVolver = computed(() => (this.desde() === 'mis-partidas' ? 'Volver a mis partidas' : 'Volver al club'));
   readonly puestos = computed<Puesto[]>(() => {
     const l = this.lobby();
     return [1, 2, 3, 4].map((cupo) => ({ cupo, jugador: l?.inscripciones.find((i) => i.numero_cupo === cupo)?.jugador ?? null }));
@@ -145,7 +147,6 @@ export class LobbyDetails {
     });
   }
 
-  // --- invitación recibida ---
   responderInvitacion(aceptar: boolean): void {
     const inv = this.miInvitacion();
     if (!inv) return;
@@ -165,7 +166,6 @@ export class LobbyDetails {
     });
   }
 
-  // --- invitar amigos ---
   abrirInvitar(): void {
     this.invitarAbierto.set(true);
     this.elegidos.set(new Set());

@@ -24,7 +24,7 @@
   } @else {
     <div class="lista-partidas">
       @for (l of visibles(); track l.id) {
-        <app-partida-card [lobby]="l" [esMia]="true" />
+        <app-partida-card [lobby]="l" [esMia]="true" origen="mis-partidas" />
       } @empty {
         <div class="vacio" style="grid-column: 1 / -1">
           <i class="bi bi-calendar2-x" aria-hidden="true"></i>

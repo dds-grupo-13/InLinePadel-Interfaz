@@ -18,7 +18,6 @@ const DIAS = [
   { n: 0, corto: 'D', largo: 'Domingo' },
 ];
 
-/** Publica de una vez la grilla de varios días y canchas (una sola operación: se crean todos o ninguno). */
 @Component({
   imports: [FormsModule, RouterLink, DatePipe, CurrencyPipe, ClubSelector],
   selector: 'app-turno-add',
@@ -39,7 +38,6 @@ export class TurnoAdd {
   readonly enviando = signal(false);
   readonly error = signal<string | null>(null);
 
-  // el formulario guarda su estado en estadoes para que el resumen se recalcule solo
   readonly elegidas = signal<Set<number>>(new Set());
   readonly diasSemana = signal<Set<number>>(new Set([0, 1, 2, 3, 4, 5, 6]));
   readonly desde = signal(hoyIso());
@@ -62,7 +60,7 @@ export class TurnoAdd {
       for (const cancha of this.elegidas()) {
         for (const h of horas) {
           const [hh, mm] = h.split(':').map(Number);
-          if (new Date(a, m - 1, d, hh, mm) <= ahora) continue; // no se publican horarios que ya pasaron
+          if (new Date(a, m - 1, d, hh, mm) <= ahora) continue;
           lista.push({ cancha, fecha: f, hora_inicio: h, duracion: this.duracion(), precio });
         }
       }

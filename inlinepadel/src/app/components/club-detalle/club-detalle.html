@@ -92,6 +92,7 @@
                   [lobby]="l"
                   [accion]="true"
                   [mostrarClub]="false"
+                  [esMia]="l.es_capitan || estoy(l)"
                   (unirse)="unirse($event)"
                 />
               }

@@ -15,7 +15,6 @@ export class CheckIn {
   readonly enviando = signal(false);
   readonly resultado = signal<{ ok: boolean; texto: string } | null>(null);
 
-  /** Mientras escribe: mayúsculas y el guion después de los primeros cuatro caracteres. */
   formatear(): void {
     const limpio = this.codigo.toUpperCase().replace(/[^0-9A-F]/g, '').slice(0, 8);
     this.codigo = limpio.length > 4 ? `${limpio.slice(0, 4)}-${limpio.slice(4)}` : limpio;

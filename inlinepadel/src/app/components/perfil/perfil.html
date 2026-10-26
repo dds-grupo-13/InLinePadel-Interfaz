@@ -11,7 +11,8 @@
     <div class="row g-3">
       <div class="col-sm-6">
         <label class="form-label" for="u">Usuario</label>
-        <input id="u" class="form-control" [value]="username" disabled />
+        <input id="u" class="form-control" name="username" [(ngModel)]="f.username" required autocomplete="username" [class.is-invalid]="errores()['username']" />
+        @if (errores()['username']) { <div class="campo-error">{{ errores()['username'] }}</div> }
       </div>
       <div class="col-sm-6">
         <label class="form-label" for="email">Email</label>

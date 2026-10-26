@@ -23,7 +23,6 @@ export class TurnoService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/clubes/turnos/`;
 
-  /** Los jugadores solo reciben turnos LIBRES de clubes activos (lo decide el backend). */
   buscar(filtros: TurnoFiltros): Observable<Turno[]> {
     return traerTodas<Turno>(this.http, this.url, filtros);
   }
@@ -44,7 +43,6 @@ export class TurnoService {
     return this.http.post<Turno>(`${this.url}${id}/disponible/`, {});
   }
 
-  /** Publica varios turnos en una sola operación (todo o nada, hasta 500). */
   crearMasivo(turnos: TurnoNuevo[]): Observable<Turno[]> {
     return this.http.post<Turno[]>(`${this.url}crear_masivo/`, turnos);
   }

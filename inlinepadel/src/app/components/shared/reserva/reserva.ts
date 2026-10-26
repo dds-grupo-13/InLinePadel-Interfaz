@@ -1,7 +1,6 @@
 import { Component, computed, input, signal } from '@angular/core';
 import { Lobby } from '../../../models/lobby.model';
 
-/** Estado de la reserva con la leyenda del backend: es lo que el jugador necesita ver primero. */
 @Component({
   selector: 'app-reserva',
   template: `
@@ -40,8 +39,6 @@ export class Reserva {
       await navigator.clipboard.writeText(codigo);
       this.copiado.set(true);
       setTimeout(() => this.copiado.set(false), 2000);
-    } catch {
-      // sin permiso de portapapeles: el código queda visible para copiarlo a mano
-    }
+    } catch {}
   }
 }

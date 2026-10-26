@@ -12,14 +12,12 @@ export class NotificacionService {
   private readonly url = `${environment.apiUrl}/social/notificaciones/`;
 
   private readonly _noLeidas = signal(0);
-  /** Cantidad de avisos sin leer, para la campana de la barra superior. */
   readonly noLeidas = this._noLeidas.asReadonly();
 
   getAll(filtros: { leida?: boolean | null }, page = 1): Observable<Page<Notificacion>> {
     return this.http.get<Page<Notificacion>>(this.url, { params: aParams({ ...filtros, page }) });
   }
 
-  /** Consulta el total de no leídas (usa solo el contador de la paginación). */
   refrescarContador(): void {
     this.http.get<Page<Notificacion>>(this.url, { params: { leida: 'false', page: 1 } }).subscribe({
       next: (p) => this._noLeidas.set(p.count),

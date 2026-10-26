@@ -23,7 +23,6 @@ export class LobbyService {
     return this.http.get<Lobby>(`${this.url}${id}/`);
   }
 
-  /** Crea la partida y toma el turno en la misma operación (CU01). */
   crear(turno: number, privacidad: Privacidad): Observable<Lobby> {
     return this.http.post<Lobby>(this.url, { turno, privacidad });
   }
@@ -32,7 +31,6 @@ export class LobbyService {
     return this.http.patch<Lobby>(`${this.url}${id}/`, { privacidad });
   }
 
-  /** Se une a una partida pública o acepta la invitación de una privada. */
   unirse(id: number): Observable<Lobby> {
     return this.http.post<Lobby>(`${this.url}${id}/unirse/`, {});
   }
@@ -45,7 +43,6 @@ export class LobbyService {
     return this.http.post<void>(`${this.url}${id}/cancelar/`, {});
   }
 
-  /** El club valida el código de reserva al llegar los jugadores. */
   checkIn(codigo_reserva: string): Observable<{ detail: string; lobby: number }> {
     return this.http.post<{ detail: string; lobby: number }>(`${this.url}check_in/`, { codigo_reserva });
   }

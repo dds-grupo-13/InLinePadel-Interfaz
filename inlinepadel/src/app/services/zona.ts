@@ -11,7 +11,6 @@ export class ZonaService {
   private readonly url = `${environment.apiUrl}/clubes/zonas/`;
   private cache$: Observable<Zona[]> | null = null;
 
-  /** Catálogo chico (sin paginar): se pide una vez y se reutiliza. */
   getAll(): Observable<Zona[]> {
     if (!this.cache$) {
       this.cache$ = this.http.get<Zona[] | Page<Zona>>(this.url).pipe(

@@ -129,7 +129,6 @@ export class ClubTurnos {
       error: (e) => {
         this.ocupado.set(false);
         this.cerrar();
-        // por ejemplo, un jugador lo tomó mientras tanto
         this.toast.error(leerError(e, 'No pudimos cambiar el turno.').mensaje);
         this.cargar();
       },

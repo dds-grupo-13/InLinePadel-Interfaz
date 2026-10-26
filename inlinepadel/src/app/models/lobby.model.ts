@@ -21,7 +21,6 @@ export interface Lobby {
   fecha_check_in: string;
   capitan: number;
   es_capitan: boolean;
-  /** Privada: el jugador recibió una invitación pendiente. */
   fui_invitado: boolean;
   turno: number;
   turno_detalle: Turno;

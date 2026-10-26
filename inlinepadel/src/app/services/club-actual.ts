@@ -4,7 +4,6 @@ import { ClubService } from './club';
 
 const CLAVE = 'club-actual';
 
-/** Club sobre el que trabaja el administrador (casi siempre uno solo; si administra varios, elige). */
 @Service()
 export class ClubActual {
   private readonly api = inject(ClubService);
@@ -24,9 +23,7 @@ export class ClubActual {
         let guardado: number | null = null;
         try {
           guardado = Number(localStorage.getItem(CLAVE)) || null;
-        } catch {
-          // sin almacenamiento: se usa el primero
-        }
+        } catch {}
         this._id.set(guardado);
         this.cargado.set(true);
       },
@@ -38,12 +35,9 @@ export class ClubActual {
     this._id.set(id);
     try {
       localStorage.setItem(CLAVE, String(id));
-    } catch {
-      // se recuerda solo mientras la pestaña esté abierta
-    }
+    } catch {}
   }
 
-  /** Vuelve a pedir los clubes (ej: después de que el sistema cambió su estado). */
   recargar(): void {
     this.cargado.set(false);
     this.cargar();

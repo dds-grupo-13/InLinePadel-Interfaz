@@ -2,12 +2,10 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { invitadoGuard, inicioGuard, rolGuard } from './guards/rol.guard';
 
-// Cada pantalla se carga cuando se la visita: el bundle inicial queda liviano (RNF04).
 export const routes: Routes = [
   { path: 'login', canActivate: [invitadoGuard], loadComponent: () => import('./components/login/login').then((m) => m.Login), title: 'Ingresar · InLine Padel' },
   { path: 'registro', canActivate: [invitadoGuard], loadComponent: () => import('./components/registro/registro').then((m) => m.Registro), title: 'Crear cuenta · InLine Padel' },
 
-  // jugador
   {
     path: '',
     canActivate: [rolGuard('jugador')],
@@ -24,7 +22,6 @@ export const routes: Routes = [
     ],
   },
 
-  // administrador de club
   {
     path: 'club',
     canActivate: [rolGuard('club')],
@@ -38,7 +35,6 @@ export const routes: Routes = [
     ],
   },
 
-  // administrador del sistema
   {
     path: 'admin',
     canActivate: [rolGuard('sistema')],
@@ -50,7 +46,6 @@ export const routes: Routes = [
     ],
   },
 
-  // cualquier usuario con sesión
   { path: 'notificaciones', canActivate: [authGuard], loadComponent: () => import('./components/notificaciones/notificaciones').then((m) => m.Notificaciones), title: 'Avisos · InLine Padel' },
 
   { path: '', pathMatch: 'full', canActivate: [inicioGuard], children: [] },

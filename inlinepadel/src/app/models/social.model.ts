@@ -3,9 +3,7 @@ export type EstadoContacto = 'PENDIENTE' | 'ACEPTADO' | 'RECHAZADO';
 
 export interface Contacto {
   id: number;
-  /** quien envía la solicitud (id de jugador) */
   jugador: number;
-  /** quien la recibe (id de jugador) */
   contacto: number;
   estado: EstadoContacto;
   fecha: string;

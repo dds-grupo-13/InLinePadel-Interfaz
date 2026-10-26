@@ -36,7 +36,6 @@ export class Contactos implements OnInit {
   readonly pestana = signal<Pestana>('amigos');
   readonly ocupado = signal(false);
 
-  // búsqueda de jugadores
   q = '';
   readonly resultados = signal<JugadorPublico[]>([]);
   readonly buscando = signal(false);
@@ -98,7 +97,6 @@ export class Contactos implements OnInit {
     this.consulta$.next(this.q.trim());
   }
 
-  /** Estado de la relación con un jugador de los resultados de búsqueda. */
   relacion(id: number): 'ninguna' | 'amigo' | 'enviada' | 'recibida' | 'rechazada' {
     const c = this.todos().find((x) => this.otro(x) === id);
     if (!c) return 'ninguna';

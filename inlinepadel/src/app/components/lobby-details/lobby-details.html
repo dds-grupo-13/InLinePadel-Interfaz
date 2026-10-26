@@ -1,5 +1,5 @@
 <div class="contenedor">
-  <a [routerLink]="volverA()" class="d-inline-block mb-3"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al club</a>
+  <a [routerLink]="volverA()" class="d-inline-block mb-3"><i class="bi bi-arrow-left" aria-hidden="true"></i> {{ textoVolver() }}</a>
 
   @if (cargando()) {
     <div class="cargando" role="status" aria-label="Cargando partida"></div>
@@ -26,7 +26,6 @@
       <div class="col-lg-7 d-grid gap-3 align-content-start">
         <app-reserva [lobby]="l" />
 
-        <!-- acciones según quién mira y en qué estado está la partida -->
         @if (vigente()) {
           <section class="panel" aria-label="Acciones">
             @if (inscripto()) {

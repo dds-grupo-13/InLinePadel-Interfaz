@@ -106,7 +106,6 @@ describe('partidas', () => {
       cuposLibres: 5,
       proximo: { id: 2 },
     });
-    // la privada sin invitación no se ofrece: no genera resumen
     expect(resumen.has(2)).toBe(false);
   });
 

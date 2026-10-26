@@ -1,6 +1,5 @@
 import { Component, ElementRef, effect, input, output, viewChild } from '@angular/core';
 
-/** Diálogo modal sobre <dialog>: el navegador resuelve foco, Esc y fondo. */
 @Component({
   selector: 'app-modal',
   template: `

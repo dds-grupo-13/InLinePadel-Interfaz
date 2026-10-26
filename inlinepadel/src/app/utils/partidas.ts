@@ -1,13 +1,11 @@
 import { Turno } from '../models/club.model';
 import { Lobby } from '../models/lobby.model';
 
-/** Nombre del capitán a partir de las inscripciones del lobby. */
 export function capitanDe(lobby: Lobby): string {
   const inscripcion = lobby.inscripciones.find((i) => i.jugador.id === lobby.capitan);
   return inscripcion?.jugador.nombre || inscripcion?.jugador.username || 'Sin capitán';
 }
 
-/** Cantidad de partidas por club (clave: id del club). */
 export function conteoPorClub(lobbies: Lobby[]): Map<number, number> {
   const conteo = new Map<number, number>();
   for (const l of lobbies) {
@@ -18,18 +16,12 @@ export function conteoPorClub(lobbies: Lobby[]): Map<number, number> {
 }
 
 export interface ResumenClub {
-  /** Partidas abiertas a las que el jugador puede unirse. */
   disponibles: number;
-  /** De esas partidas, cuántas tienen una invitación pendiente para el jugador. */
   invitaciones: number;
   cuposLibres: number;
   proximo: Lobby | null;
 }
 
-/**
- * Resume la oferta de cada club para las tarjetas del inicio: cantidad de
- * lobbies unibles, invitaciones pendientes, cupos y la próxima partida.
- */
 export function resumenPorClub(lobbies: Lobby[]): Map<number, ResumenClub> {
   const resumen = new Map<number, ResumenClub>();
   for (const l of lobbies) {
@@ -52,7 +44,6 @@ export function resumenPorClub(lobbies: Lobby[]): Map<number, ResumenClub> {
   return resumen;
 }
 
-/** Agrupa los lobbies por día, ordenados por fecha y hora. */
 export function agruparPorDia(lobbies: Lobby[]): { fecha: string; lobbies: Lobby[] }[] {
   const porFecha = new Map<string, Lobby[]>();
   for (const l of lobbies) {
@@ -78,7 +69,6 @@ export interface GrupoTurno {
   turnos: Turno[];
 }
 
-/** Agrupa los turnos libres por horario: una fila por hora, con sus canchas. */
 export function agruparTurnos(turnos: Turno[]): GrupoTurno[] {
   const porHora = new Map<string, Turno[]>();
   for (const t of turnos) {
@@ -98,7 +88,6 @@ export function agruparTurnos(turnos: Turno[]): GrupoTurno[] {
     }));
 }
 
-/** Una partida es unible si está abierta, tiene lugar y es pública o el jugador fue invitado. */
 export function sePuedeUnir(lobby: Lobby): boolean {
   return (
     lobby.estado === 'EN_FORMACION' &&

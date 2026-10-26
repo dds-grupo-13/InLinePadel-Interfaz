@@ -1,6 +1,3 @@
-/* ===== InLine Padel · sistema de diseño =====
-   Base: Bootstrap 5.3 (cátedra) + tema propio. Los colores salen de la cancha:
-   azul de pista, amarillo pelota y líneas blancas. */
 
 :root {
   --ip-ink: #12202f;
@@ -65,7 +62,6 @@ h3 { font-size: 1.3rem; }
 a { text-underline-offset: 3px; }
 :focus-visible { outline: 3px solid var(--ip-ball); outline-offset: 2px; box-shadow: 0 0 0 5px var(--ip-court); border-radius: 6px; }
 
-/* botones */
 .btn { font-weight: 500; border-radius: 10px; padding: 0.55rem 1rem; }
 .btn-lg { padding: 0.8rem 1.4rem; }
 .btn-primary { --bs-btn-bg: var(--ip-court); --bs-btn-border-color: var(--ip-court); --bs-btn-hover-bg: var(--ip-court-dark);
@@ -79,14 +75,12 @@ a { text-underline-offset: 3px; }
 .btn-tool { background: transparent; border: 1px solid var(--ip-line); color: var(--ip-ink); }
 .btn-tool:hover { background: var(--ip-info-bg); }
 
-/* formularios */
 .form-label { font-weight: 500; font-size: 0.9rem; margin-bottom: 0.25rem; }
 .form-control, .form-select { background-color: var(--ip-surface); color: var(--ip-ink); border-color: var(--ip-line); padding: 0.6rem 0.8rem; }
 .form-control:focus, .form-select:focus { border-color: var(--ip-court); box-shadow: 0 0 0 3px rgba(29, 78, 158, 0.25); }
 .campo-error { color: var(--ip-bad); font-size: 0.85rem; margin-top: 0.2rem; }
 .form-control.is-invalid, .form-select.is-invalid { border-color: var(--ip-bad); background-image: none; }
 
-/* superficies */
 .panel { background: var(--ip-surface); border: 1px solid var(--ip-line); border-radius: var(--ip-radius); padding: 1.25rem; }
 .panel-flat { background: transparent; border: 0; padding: 0; }
 .panel h2, .panel h3 { margin-bottom: 0.75rem; }
@@ -96,7 +90,6 @@ a { text-underline-offset: 3px; }
 .cabecera p { margin: 0.35rem 0 0; color: var(--ip-muted); max-width: 60ch; }
 .acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 
-/* barra superior y navegación */
 .topbar { background: var(--ip-court-dark); color: #fff; position: sticky; top: 0; z-index: 1020; }
 [data-bs-theme='dark'] .topbar { background: #0b1b3a; border-bottom: 1px solid var(--ip-line); }
 .topbar .interior { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; padding: 0.55rem 1rem; }
@@ -119,7 +112,6 @@ a { text-underline-offset: 3px; }
 .nav-movil a.activo i { background: var(--ip-ball); color: #12202f; border-radius: 99px; padding: 2px 14px; }
 .nav-movil .crear i { background: var(--ip-court); color: #fff; border-radius: 99px; padding: 2px 14px; }
 
-/* estados (siempre texto + color) */
 .estado { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.15rem 0.6rem; border-radius: 99px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
 .estado::before { content: ''; width: 7px; height: 7px; border-radius: 99px; background: currentColor; }
 .estado.ok { color: var(--ip-ok); background: var(--ip-ok-bg); }
@@ -128,7 +120,6 @@ a { text-underline-offset: 3px; }
 .estado.off { color: var(--ip-off); background: var(--ip-off-bg); }
 .estado.info { color: var(--ip-info); background: var(--ip-info-bg); }
 
-/* reserva: el dato más importante del jugador */
 .reserva { border-radius: var(--ip-radius); padding: 1rem 1.15rem; display: flex; gap: 0.85rem; align-items: flex-start; border: 1px solid transparent; }
 .reserva i { font-size: 1.5rem; line-height: 1.2; }
 .reserva .texto { font-weight: 600; font-size: 1.05rem; }
@@ -137,7 +128,6 @@ a { text-underline-offset: 3px; }
 .reserva.cancelada { background: var(--ip-off-bg); color: var(--ip-off); }
 .codigo { font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 2rem; letter-spacing: 0.12em; line-height: 1; display: inline-flex; align-items: center; gap: 0.75rem; margin-top: 0.4rem; background: var(--ip-surface); color: var(--ip-ink); padding: 0.35rem 0.8rem; border-radius: 10px; border: 2px dashed currentColor; }
 
-/* tarjetas de partida */
 .lista-partidas { display: grid; gap: 0.85rem; grid-template-columns: 1fr; }
 @media (min-width: 768px) { .lista-partidas { grid-template-columns: 1fr 1fr; } }
 .partida { background: var(--ip-surface); border: 1px solid var(--ip-line); border-radius: var(--ip-radius); padding: 1rem; display: grid; grid-template-columns: 1fr auto; gap: 0.5rem 1rem; text-decoration: none; color: inherit; transition: border-color 0.15s, transform 0.15s; position: relative; }
@@ -148,7 +138,6 @@ a { text-underline-offset: 3px; }
 .partida .pie { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; border-top: 1px solid var(--ip-line); padding-top: 0.7rem; }
 .partida.mia { border-left: 5px solid var(--ip-ball); }
 
-/* mini cancha con los cuatro cupos */
 .cupos-cancha { display: block; }
 .cupos-cancha .piso { fill: var(--ip-court); }
 .cupos-cancha .linea { stroke: #fff; stroke-width: 2; fill: none; opacity: 0.9; }
@@ -162,12 +151,10 @@ a { text-underline-offset: 3px; }
 .jugadores-lista .libre .avatar { background: transparent; border: 2px dashed var(--ip-line); color: var(--ip-muted); }
 .jugadores-lista .libre { color: var(--ip-muted); border-style: dashed; }
 
-/* datos clave-valor */
 .datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.9rem 1.25rem; margin: 0; }
 .datos dt { font-size: 0.82rem; color: var(--ip-muted); font-weight: 500; }
 .datos dd { margin: 0; font-weight: 600; }
 
-/* turnos como fichas */
 .fichas { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .ficha { border: 1.5px solid var(--ip-line); background: var(--ip-surface); color: var(--ip-ink); border-radius: 12px; padding: 0.5rem 0.8rem; text-align: left; min-width: 112px; display: flex; flex-direction: column; line-height: 1.2; cursor: pointer; }
 .ficha strong { font-family: 'Barlow Semi Condensed', sans-serif; font-size: 1.35rem; }
@@ -181,7 +168,6 @@ a { text-underline-offset: 3px; }
 .ficha.no_disponible { background: var(--ip-off-bg); border-style: dashed; }
 .ficha.cumplido { background: var(--ip-off-bg); opacity: 0.7; }
 
-/* pasos */
 .pasos { display: grid; gap: 1rem; }
 .paso { background: var(--ip-surface); border: 1px solid var(--ip-line); border-radius: var(--ip-radius); padding: 1.1rem 1.25rem; }
 .paso > h3 { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.9rem; }
@@ -189,19 +175,16 @@ a { text-underline-offset: 3px; }
 .paso.hecho > h3 .n { background: var(--ip-ok); }
 .paso.bloqueado-paso { opacity: 0.55; }
 
-/* tablas */
 .tabla-wrap { overflow-x: auto; background: var(--ip-surface); border: 1px solid var(--ip-line); border-radius: var(--ip-radius); }
 .tabla-wrap .table { --bs-table-bg: transparent; --bs-table-color: var(--ip-ink); --bs-table-border-color: var(--ip-line); margin: 0; }
 .tabla-wrap th { font-size: 0.82rem; color: var(--ip-muted); font-weight: 600; white-space: nowrap; }
 .tabla-wrap td { vertical-align: middle; }
 
-/* pestañas */
 .pestanas { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--ip-line); margin-bottom: 1.1rem; overflow-x: auto; }
 .pestanas button { background: none; border: 0; padding: 0.6rem 0.9rem; font-weight: 600; color: var(--ip-muted); border-bottom: 3px solid transparent; white-space: nowrap; }
 .pestanas button.activa { color: var(--ip-ink); border-bottom-color: var(--ip-ball); }
 .pestanas .cuenta { background: var(--ip-ball); color: #12202f; border-radius: 99px; font-size: 0.72rem; padding: 0 0.45rem; margin-left: 0.35rem; font-weight: 700; }
 
-/* vacío, cargando, errores */
 .vacio { text-align: center; padding: 2.5rem 1rem; color: var(--ip-muted); }
 .vacio i { font-size: 2.2rem; display: block; margin-bottom: 0.4rem; color: var(--ip-court); }
 .vacio strong { display: block; color: var(--ip-ink); font-size: 1.1rem; margin-bottom: 0.2rem; }
@@ -215,14 +198,12 @@ a { text-underline-offset: 3px; }
 .alerta.info { background: var(--ip-info-bg); color: var(--ip-info); }
 .alerta.ok { background: var(--ip-ok-bg); color: var(--ip-ok); }
 
-/* notificaciones */
 .notif { display: flex; gap: 0.8rem; padding: 0.85rem 1rem; border-bottom: 1px solid var(--ip-line); align-items: flex-start; }
 .notif:last-child { border-bottom: 0; }
 .notif.nueva { background: var(--ip-info-bg); }
 .notif .punto { width: 10px; height: 10px; border-radius: 99px; background: var(--ip-court); margin-top: 0.45rem; flex: none; }
 .notif:not(.nueva) .punto { background: transparent; }
 
-/* toasts y diálogos */
 .toasts { position: fixed; z-index: 2000; left: 0; right: 0; bottom: 5.2rem; display: grid; gap: 0.5rem; justify-items: center; padding: 0 1rem; pointer-events: none; }
 @media (min-width: 992px) { .toasts { bottom: 1.25rem; justify-items: end; } }
 .toast-ip { pointer-events: auto; max-width: 420px; width: 100%; background: var(--ip-ink); color: var(--ip-surface); border-radius: 12px; padding: 0.75rem 1rem; display: flex; gap: 0.7rem; align-items: flex-start; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); animation: entra 0.2s ease-out; }
@@ -236,7 +217,6 @@ dialog.modal-ip .titulo-modal { display: flex; justify-content: space-between; a
 dialog.modal-ip .titulo-modal h3 { margin: 0; }
 dialog.modal-ip .pie-modal { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem; flex-wrap: wrap; }
 
-/* acceso */
 .acceso { min-height: 100dvh; display: grid; grid-template-columns: 1fr; }
 @media (min-width: 900px) { .acceso { grid-template-columns: 1.1fr 1fr; } }
 .acceso-hero { background: var(--ip-court-dark); color: #fff; padding: 2rem 1.5rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1.5rem; position: relative; overflow: hidden; }
@@ -257,12 +237,10 @@ dialog.modal-ip .pie-modal { display: flex; justify-content: flex-end; gap: 0.5r
 .nowrap { white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
-/* tarjeta clickeable completa con botones propios por encima */
 .partida a.stretched { color: inherit; text-decoration: none; }
 .partida a.stretched::after { content: ''; position: absolute; inset: 0; border-radius: var(--ip-radius); }
 .partida .btn, .partida button { position: relative; z-index: 1; }
 
-/* ===== inicio: clubes, toggle y alta de partida ===== */
 .volver { display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.9rem; text-decoration: none; font-weight: 500; }
 .accesos { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 .accesos .cuenta { background: var(--ip-ball); color: #12202f; border-radius: 99px; font-size: 0.75rem; font-weight: 700; padding: 0 0.45rem; margin-left: 0.3rem; }

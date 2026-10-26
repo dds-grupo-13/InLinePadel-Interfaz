@@ -5,13 +5,11 @@ import { environment } from '../../environments/environment';
 import { Contacto, Invitacion } from '../models/social.model';
 import { traerTodas } from '../utils/http';
 
-/** Contactos e invitaciones a partidas privadas (RF06). */
 @Service()
 export class SocialService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/social`;
 
-  // --- contactos ---
   contactos(estado?: string): Observable<Contacto[]> {
     return traerTodas<Contacto>(this.http, `${this.base}/contactos/`, { estado });
   }
@@ -28,7 +26,6 @@ export class SocialService {
     return this.http.delete<void>(`${this.base}/contactos/${id}/`);
   }
 
-  // --- invitaciones ---
   invitaciones(filtros: { rol?: 'enviadas' | 'recibidas'; lobby?: number; estado?: string } = {}): Observable<Invitacion[]> {
     return traerTodas<Invitacion>(this.http, `${this.base}/invitaciones/`, filtros);
   }

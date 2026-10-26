@@ -12,7 +12,6 @@ import { hoyIso, sumarDias } from '../../utils/fechas';
 import { HhmmPipe } from '../../utils/hhmm.pipe';
 import { agruparTurnos } from '../../utils/partidas';
 
-/** Alta de partida dentro de un club: se elige día, turno y cancha, y se confirma. */
 @Component({
   imports: [FormsModule, DatePipe, CurrencyPipe, HhmmPipe],
   selector: 'app-lobby-add',
@@ -93,7 +92,6 @@ export class LobbyAdd {
         this.enviando.set(false);
         const r = leerError(e, 'No pudimos crear la partida.');
         this.error.set(r.mensaje);
-        // 409: otro jugador se quedó con el turno; se vuelve a mostrar la grilla actualizada
         if (r.status === 409) this.cargarTurnos();
       },
     });

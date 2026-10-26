@@ -52,7 +52,6 @@ export class App {
     }
   });
   constructor() {
-    // los avisos sin leer se consultan al entrar y cada minuto (límite de la API: 100 pedidos/min)
     effect((onCleanup) => {
       if (!this.auth.isLoggedIn()) {
         this.notif.reiniciar();

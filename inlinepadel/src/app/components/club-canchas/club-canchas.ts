@@ -24,7 +24,6 @@ export class ClubCanchas {
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
 
-  // formulario (alta y edición)
   readonly formAbierto = signal(false);
   readonly enviando = signal(false);
   readonly errorForm = signal<string | null>(null);

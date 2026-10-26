@@ -12,7 +12,6 @@ import { LobbyResumen } from '../shared/lobby-resumen/lobby-resumen';
 
 type Pestana = 'recibidas' | 'enviadas';
 
-/** Invitaciones a partidas privadas: las que recibí y las que envié. */
 @Component({
   imports: [RouterLink, DatePipe, Estado, JugadorNombre, LobbyResumen],
   selector: 'app-pedidos',

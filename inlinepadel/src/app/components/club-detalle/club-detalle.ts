@@ -5,6 +5,7 @@ import { forkJoin } from 'rxjs';
 import { Club, Zona } from '../../models/club.model';
 import { Lobby } from '../../models/lobby.model';
 import { AccionesLobby } from '../../services/acciones-lobby';
+import { AuthService } from '../../services/auth';
 import { ClubService } from '../../services/club';
 import { LobbyService } from '../../services/lobby';
 import { ToastService } from '../../services/toast';
@@ -17,7 +18,6 @@ import { PartidaCard } from '../shared/partida-card/partida-card';
 
 type Vista = 'unirse' | 'crear';
 
-/** Dentro de un club: las partidas abiertas para sumarse o el alta de una nueva. */
 @Component({
   imports: [RouterLink, DatePipe, PartidaCard, LobbyAdd],
   selector: 'app-club-detalle',
@@ -31,6 +31,7 @@ export class ClubDetalle {
   private readonly lobbiesApi = inject(LobbyService);
   private readonly acciones = inject(AccionesLobby);
   private readonly toast = inject(ToastService);
+  private readonly auth = inject(AuthService);
 
   readonly club = signal<Club | null>(null);
   readonly zonas = signal<Zona[]>([]);
@@ -72,7 +73,6 @@ export class ClubDetalle {
         club: id,
         estado: 'EN_FORMACION',
         con_cupos: true,
-        mios: false,
       }),
     }).subscribe({
       next: (r) => {
@@ -103,6 +103,11 @@ export class ClubDetalle {
     if (cambio) this.cargar(Number(this.id()), true);
   }
 
+  estoy(l: Lobby): boolean {
+    const yo = this.auth.usuarioActual()?.id;
+    return l.inscripciones.some((i) => i.jugador.id === yo);
+  }
+
   recargar(): void {
     this.cargar(Number(this.id()), true);
   }
@@ -111,7 +116,6 @@ export class ClubDetalle {
     this.vista.set('crear');
   }
 
-  /** "Hoy" o "Mañana" para el encabezado de cada día. */
   etiquetaDia(fecha: string): string {
     const hoy = hoyIso();
     if (fecha === hoy) return 'Hoy';

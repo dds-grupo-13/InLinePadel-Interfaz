@@ -6,7 +6,6 @@ import { catchError, of, switchMap } from 'rxjs';
 import { LobbyService } from '../../../services/lobby';
 import { HhmmPipe } from '../../../utils/hhmm.pipe';
 
-/** Enlace con club, día y hora de una partida a partir de su id. */
 @Component({
   imports: [RouterLink, DatePipe, HhmmPipe],
   selector: 'app-lobby-resumen',

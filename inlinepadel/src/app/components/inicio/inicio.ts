@@ -14,7 +14,6 @@ import { hoyIso, sumarDias } from '../../utils/fechas';
 import { ResumenClub, resumenPorClub } from '../../utils/partidas';
 import { HhmmPipe } from '../../utils/hhmm.pipe';
 
-/** Pantalla de inicio del jugador: clubes disponibles y partidas para sumarse. */
 @Component({
   imports: [FormsModule, RouterLink, HhmmPipe],
   selector: 'app-inicio',
@@ -71,7 +70,6 @@ export class Inicio implements OnInit {
     return this.resumenes().get(club.id) ?? this.sinResumen;
   }
 
-  /** "Hoy", "Mañana" o la fecha corta para la próxima partida del club. */
   etiquetaDia(fecha: string): string {
     const hoy = hoyIso();
     if (fecha === hoy) return 'Hoy';
@@ -84,7 +82,6 @@ export class Inicio implements OnInit {
       clubes: this.clubesApi.todos(),
       zonas: this.zonasApi.getAll(),
       partidas: this.lobbies.todos({ estado: 'EN_FORMACION', con_cupos: true, mios: false }),
-      // si falla el contador, no debe tumbar la pantalla
       invitaciones: this.social
         .invitaciones({ rol: 'recibidas', estado: 'PENDIENTE' })
         .pipe(catchError(() => of([]))),

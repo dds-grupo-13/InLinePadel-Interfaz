@@ -2,9 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 export interface ErrorApi {
   status: number;
-  /** Mensaje listo para mostrar al usuario, en lenguaje natural (RNF06). */
   mensaje: string;
-  /** Mensajes por campo, para marcar los inputs que hay que corregir. */
   campos: Record<string, string>;
 }
 

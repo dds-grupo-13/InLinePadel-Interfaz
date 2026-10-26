@@ -13,7 +13,6 @@ import { leerError } from '../../utils/errores';
   templateUrl: './club-form.html',
 })
 export class ClubForm implements OnInit {
-  /** Llega por la ruta /admin/clubes/:id; sin id es un alta. */
   readonly id = input<string>();
 
   private readonly api = inject(ClubService);

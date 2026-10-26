@@ -9,11 +9,6 @@ import { ConfirmarService } from './confirmar';
 import { LobbyService } from './lobby';
 import { ToastService } from './toast';
 
-/**
- * Acciones sobre una partida que se repiten en el listado y en el detalle:
- * piden confirmación, llaman a la API y avisan el resultado en lenguaje natural.
- * Devuelven true si algo cambió y la pantalla debe recargarse.
- */
 @Service()
 export class AccionesLobby {
   private readonly api = inject(LobbyService);
