@@ -37,6 +37,10 @@ export class LobbyAdd {
 
   readonly grupos = computed(() => agruparTurnos(this.turnos()));
   readonly canchasLibres = computed(() => new Set(this.turnos().map((t) => t.cancha)).size);
+  readonly ultimoMomento = computed(() => {
+    const t = this.turnoElegido();
+    return !!t && new Date(t.cierre).getTime() <= Date.now();
+  });
   readonly precioPorJugador = computed(() => (this.turnoElegido() ? Number(this.turnoElegido()!.precio) / 4 : 0));
 
   constructor() {

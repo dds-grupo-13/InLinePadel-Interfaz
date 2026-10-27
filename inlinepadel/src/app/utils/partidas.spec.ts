@@ -1,55 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { Turno } from '../models/club.model';
-import { Lobby } from '../models/lobby.model';
+import { lobby, turno } from '../testing/datos';
 import { agruparPorDia, agruparTurnos, capitanDe, resumenesPorClub, sePuedeUnir } from './partidas';
-
-const turno = (extra: Partial<Turno> = {}): Turno => ({
-  id: 1,
-  fecha: '2026-10-20',
-  hora_inicio: '20:00:00',
-  duracion: 90,
-  precio: '40000.00',
-  estado: 'LIBRE',
-  cancha: 1,
-  inicio: '2026-10-20T20:00:00',
-  fin: '2026-10-20T21:30:00',
-  club: 1,
-  club_nombre: 'Club Norte',
-  cancha_numero: 1,
-  cancha_tipo: 'TECHADA',
-  ...extra,
-});
-
-const lobby = (extra: Partial<Lobby> = {}): Lobby => ({
-  id: 1,
-  privacidad: 'PUBLICO',
-  estado: 'EN_FORMACION',
-  fecha_creacion: '2026-10-19T10:00:00',
-  plazo_limite: '2026-10-21T10:00:00',
-  fecha_check_in: '2026-10-20T19:00:00',
-  capitan: 1,
-  es_capitan: false,
-  fui_invitado: false,
-  turno: 1,
-  turno_detalle: turno(),
-  inscripciones: [
-    {
-      id: 1,
-      lobby: 1,
-      jugador: { id: 1, username: 'nico', nombre: 'Nico', posicion: 'DRIVE', zona: null },
-      numero_cupo: 1,
-      fecha_inscripcion: '2026-10-19T10:00:00',
-    },
-  ],
-  cupos_ocupados: 1,
-  cupos_libres: 3,
-  precio_total: '40000.00',
-  precio_por_jugador: '10000.00',
-  estado_reserva: 'PROVISORIA',
-  mensaje_reserva: '',
-  codigo_reserva: null,
-  ...extra,
-});
 
 describe('partidas', () => {
   it('encuentra el nombre del capitán', () => {

@@ -27,13 +27,17 @@
           @for (i of recibidas(); track i.id) {
             <li class="flex-wrap">
               <span class="flex-grow-1">
-                <strong><app-jugador-nombre [id]="i.emisor" /></strong> te invitó a<br />
+                @if (i.tipo === 'CESION') {
+                  <strong><app-jugador-nombre [id]="i.emisor" /></strong> te ofrece su lugar (reserva confirmada) en<br />
+                } @else {
+                  <strong><app-jugador-nombre [id]="i.emisor" /></strong> te invitó a<br />
+                }
                 <app-lobby-resumen [id]="i.lobby" />
                 <br /><small class="muted">{{ i.fecha | date: 'd MMM, HH:mm' }}</small>
               </span>
               @if (i.estado === 'PENDIENTE') {
                 <span class="acciones">
-                  <button type="button" class="btn btn-primary btn-sm" (click)="aceptarInvitacion(i)" [disabled]="ocupado()">Aceptar</button>
+                  <button type="button" class="btn btn-primary btn-sm" (click)="aceptarInvitacion(i)" [disabled]="ocupado()">{{ i.tipo === 'CESION' ? 'Aceptar y tomar el lugar' : 'Aceptar' }}</button>
                   <button type="button" class="btn btn-tool btn-sm" (click)="rechazarInvitacion(i)" [disabled]="ocupado()">Rechazar</button>
                 </span>
               } @else {
@@ -50,7 +54,11 @@
           @for (i of enviadas(); track i.id) {
             <li class="flex-wrap">
               <span class="flex-grow-1">
-                Invitaste a <strong><app-jugador-nombre [id]="i.receptor" /></strong><br />
+                @if (i.tipo === 'CESION') {
+                  Ofreciste tu lugar a <strong><app-jugador-nombre [id]="i.receptor" /></strong><br />
+                } @else {
+                  Invitaste a <strong><app-jugador-nombre [id]="i.receptor" /></strong><br />
+                }
                 <app-lobby-resumen [id]="i.lobby" />
               </span>
               <app-estado [valor]="i.estado" />

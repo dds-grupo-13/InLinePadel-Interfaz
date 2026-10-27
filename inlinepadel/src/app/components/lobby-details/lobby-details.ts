@@ -61,6 +61,9 @@ export class LobbyDetails {
   readonly contactos = signal<JugadorPublico[]>([]);
   readonly elegidos = signal<Set<number>>(new Set());
 
+  readonly cederAbierto = signal(false);
+  readonly receptorCesion = signal<number | null>(null);
+
   protected readonly miId = computed(() => this.auth.usuarioActual()?.id ?? 0);
   readonly inscripto = computed(() => !!this.lobby()?.inscripciones.some((i) => i.jugador.id === this.miId()));
   readonly abierta = computed(() => this.lobby()?.estado === 'EN_FORMACION');
@@ -86,7 +89,7 @@ export class LobbyDetails {
     });
   }
 
-  cargar(): void {
+  cargar(alCargar?: (l: Lobby) => void): void {
     const id = Number(this.id());
     this.error.set(null);
     this.lobbies.get(id).subscribe({
@@ -94,6 +97,7 @@ export class LobbyDetails {
         this.lobby.set(l);
         this.cargando.set(false);
         this.cargarContexto(l);
+        alCargar?.(l);
       },
       error: (e) => {
         this.cargando.set(false);
@@ -151,11 +155,16 @@ export class LobbyDetails {
     const inv = this.miInvitacion();
     if (!inv) return;
     this.ocupado.set(true);
+    const cesion = inv.tipo === 'CESION';
     const op = aceptar ? this.social.aceptarInvitacion(inv.id) : this.social.rechazarInvitacion(inv.id);
     op.subscribe({
       next: () => {
-        this.toast.ok(aceptar ? 'Aceptaste la invitación: ya sos parte de la partida.' : 'Rechazaste la invitación.');
         this.ocupado.set(false);
+        if (aceptar && cesion) {
+          this.cargar((l) => this.toast.ok(`Tomaste el lugar: la reserva está confirmada${l.codigo_reserva ? ' — código ' + l.codigo_reserva : ''}.`));
+          return;
+        }
+        this.toast.ok(aceptar ? 'Aceptaste la invitación: ya sos parte de la partida.' : cesion ? 'Rechazaste el lugar.' : 'Rechazaste la invitación.');
         this.cargar();
       },
       error: (e) => {
@@ -169,15 +178,44 @@ export class LobbyDetails {
   abrirInvitar(): void {
     this.invitarAbierto.set(true);
     this.elegidos.set(new Set());
+    this.cargarContactos(this.invitacionesEnviadas().filter((i) => i.estado === 'PENDIENTE').map((i) => i.receptor));
+  }
+
+  abrirCeder(): void {
+    this.cederAbierto.set(true);
+    this.receptorCesion.set(null);
+    this.cargarContactos([]);
+  }
+
+  confirmarCesion(): void {
+    const l = this.lobby();
+    const receptor = this.receptorCesion();
+    if (!l || receptor === null || this.ocupado()) return;
+    this.ocupado.set(true);
+    this.lobbies.ceder(l.id, receptor).subscribe({
+      next: () => {
+        const nombre = this.contactos().find((c) => c.id === receptor)?.nombre ?? 'tu contacto';
+        this.toast.ok(`Ofreciste tu lugar a ${nombre}. Seguís en la partida hasta que acepte.`);
+        this.ocupado.set(false);
+        this.cederAbierto.set(false);
+        this.cargar();
+      },
+      error: (e) => {
+        this.toast.error(leerError(e, 'No pudimos ofrecer tu lugar.').mensaje);
+        this.ocupado.set(false);
+        this.cederAbierto.set(false);
+        this.cargar();
+      },
+    });
+  }
+
+  private cargarContactos(ademasExcluidos: number[]): void {
     this.cargandoContactos.set(true);
     this.social.contactos('ACEPTADO').subscribe({
       next: (cs) => {
         const yo = this.miId();
         const l = this.lobby()!;
-        const excluidos = new Set([
-          ...l.inscripciones.map((i) => i.jugador.id),
-          ...this.invitacionesEnviadas().filter((i) => i.estado === 'PENDIENTE').map((i) => i.receptor),
-        ]);
+        const excluidos = new Set([...l.inscripciones.map((i) => i.jugador.id), ...ademasExcluidos]);
         const ids = cs.map((c) => (c.jugador === yo ? c.contacto : c.jugador)).filter((id) => !excluidos.has(id));
         if (ids.length === 0) {
           this.contactos.set([]);

@@ -9,14 +9,16 @@ import { Lobby } from '../../../models/lobby.model';
       <div>
         <div class="texto">{{ lobby().mensaje_reserva }}</div>
         @if (lobby().codigo_reserva; as codigo) {
-          <div class="codigo" aria-label="Código de reserva">
-            <span>{{ codigo }}</span>
-            <button type="button" class="btn btn-sm btn-tool" (click)="copiar(codigo)">
-              <i class="bi bi-clipboard" aria-hidden="true"></i> {{ copiado() ? 'Copiado' : 'Copiar' }}
-            </button>
-          </div>
-          @if (lobby().estado_reserva !== 'CUMPLIDA') {
-            <div class="small mt-2">Presentalo en el club al llegar. El pago se hace en el mostrador.</div>
+          @if (lobby().estado_reserva === 'CONFIRMADA' || lobby().estado_reserva === 'CUMPLIDA') {
+            <div class="codigo" aria-label="Código de reserva">
+              <span>{{ codigo }}</span>
+              <button type="button" class="btn btn-sm btn-tool" (click)="copiar(codigo)">
+                <i class="bi bi-clipboard" aria-hidden="true"></i> {{ copiado() ? 'Copiado' : 'Copiar' }}
+              </button>
+            </div>
+            @if (lobby().estado_reserva === 'CONFIRMADA') {
+              <div class="small mt-2">Presentalo en el club al llegar. El pago se hace en el mostrador.</div>
+            }
           }
         }
       </div>

@@ -99,7 +99,7 @@ export class Perfil implements OnInit {
   async darDeBaja(): Promise<void> {
     const ok = await this.confirmar.pedirConfirmacion({
       titulo: 'Dar de baja mi cuenta',
-      mensaje: 'Vas a salir de tus partidas vigentes (si sos capitán, la capitanía pasa al siguiente jugador) y no vas a poder volver a entrar con esta cuenta. No se puede deshacer.',
+      mensaje: 'Vas a salir de tus partidas vigentes (si sos capitán, la capitanía pasa al siguiente jugador) y no vas a poder volver a entrar con esta cuenta. Si tenés una partida con reserva firme, no vas a poder darte de baja hasta después de jugarla. No se puede deshacer.',
       confirmar: 'Dar de baja mi cuenta',
       cancelar: 'Mantener mi cuenta',
       peligro: true,

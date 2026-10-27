@@ -36,6 +36,9 @@
                     <app-estado [valor]="l.reserva" />
                     <app-estado [valor]="l.privacidad" />
                     @if (l.codigo_reserva) { <code class="fs-6">{{ l.codigo_reserva }}</code> }
+                    @if (puedeCancelar(t)) {
+                      <button type="button" class="btn btn-outline-danger btn-sm" (click)="abrirCancelacion(t)">Cancelar partida</button>
+                    }
                   } @else {
                     <app-estado [valor]="t.estado" />
                   }
@@ -49,4 +52,36 @@
       }
     </div>
   }
+
+  <app-modal [abierto]="cancelando() !== null" titulo="Cancelar la partida" (cerrar)="cerrarCancelacion()">
+    @if (cancelando(); as t) {
+      <p>
+        Cancha {{ t.cancha_numero }} · {{ t.fecha | date: 'EEEE d/M' }} a las {{ t.hora_inicio | hhmm }}.
+        Se avisa a los jugadores y el turno queda como No disponible; podés volver a publicarlo desde Turnos.
+      </p>
+      <label class="form-label" for="motivo-cancelacion">Motivo (se les muestra a los jugadores)</label>
+      <textarea
+        id="motivo-cancelacion"
+        class="form-control"
+        rows="3"
+        [maxLength]="MOTIVO_MAX"
+        [value]="motivo()"
+        (input)="motivo.set($any($event.target).value)"
+        [class.is-invalid]="motivo().length > 0 && !motivoValido()"
+      ></textarea>
+      <div class="d-flex justify-content-between muted small mt-1">
+        <span>Mínimo {{ MOTIVO_MIN }} caracteres.</span>
+        <span>{{ motivo().length }}/{{ MOTIVO_MAX }}</span>
+      </div>
+      @if (errorCancelacion()) {
+        <div class="alerta bad mt-3" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span>{{ errorCancelacion() }}</span></div>
+      }
+      <div class="pie-modal">
+        <button type="button" class="btn btn-tool" (click)="cerrarCancelacion()" [disabled]="enviando()">Mantener la partida</button>
+        <button type="button" class="btn btn-danger" (click)="confirmarCancelacion()" [disabled]="!motivoValido() || enviando()">
+          {{ enviando() ? 'Cancelando…' : 'Cancelar partida' }}
+        </button>
+      </div>
+    }
+  </app-modal>
 </div>

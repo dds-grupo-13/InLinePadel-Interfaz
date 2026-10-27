@@ -45,8 +45,14 @@ import { Estado } from '../estado/estado';
             <app-estado [valor]="l.estado" />
           }
           <app-estado [valor]="l.privacidad" />
+          @if (l.reserva_firme) {
+            <span class="estado warn"><i class="bi bi-lock-fill" aria-hidden="true"></i> Reserva firme</span>
+          }
           @if (l.estado === 'EN_FORMACION') {
             <span class="muted small">{{ l.cupos_libres === 1 ? 'Falta 1 jugador' : 'Faltan ' + l.cupos_libres + ' jugadores' }}</span>
+          }
+          @if (l.aviso_cierre) {
+            <span class="muted small w-100">{{ l.aviso_cierre }}</span>
           }
         </div>
         <div class="d-flex gap-3 align-items-center">
