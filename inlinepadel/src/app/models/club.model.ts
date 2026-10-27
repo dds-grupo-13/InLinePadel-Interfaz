@@ -63,6 +63,8 @@ export interface TurnoOcupacion {
   id: number;
   fecha: string;
   hora_inicio: string;
+  inicio: string;
+  fin: string;
   cancha: number;
   cancha_numero: number;
   estado: EstadoTurno;

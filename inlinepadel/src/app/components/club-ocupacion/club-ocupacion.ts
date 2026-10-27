@@ -55,7 +55,7 @@ export class ClubOcupacion {
 
   puedeCancelar(t: TurnoOcupacion): boolean {
     const reserva = t.lobby?.reserva;
-    return (reserva === 'PROVISORIA' || reserva === 'CONFIRMADA') && t.fecha >= hoyIso();
+    return (reserva === 'PROVISORIA' || reserva === 'CONFIRMADA') && new Date(t.inicio).getTime() > Date.now();
   }
 
   abrirCancelacion(t: TurnoOcupacion): void {

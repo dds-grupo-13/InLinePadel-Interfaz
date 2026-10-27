@@ -11,8 +11,10 @@ import { TurnoService } from '../../services/turno';
 import { hoyIso } from '../../utils/fechas';
 import { ClubOcupacion } from './club-ocupacion';
 
-const turno = (id: number, reserva: 'PROVISORIA' | 'CONFIRMADA' | 'CUMPLIDA' | null, fecha = hoyIso()): TurnoOcupacion => ({
-  id, fecha, hora_inicio: '20:00:00', cancha: 1, cancha_numero: 1, estado: reserva ? 'BLOQUEADO' : 'LIBRE',
+const enHoras = (h: number) => new Date(Date.now() + h * 3_600_000).toISOString();
+
+const turno = (id: number, reserva: 'PROVISORIA' | 'CONFIRMADA' | 'CUMPLIDA' | null, inicio = enHoras(2)): TurnoOcupacion => ({
+  id, fecha: hoyIso(), hora_inicio: '20:00:00', inicio, fin: enHoras(3.5), cancha: 1, cancha_numero: 1, estado: reserva ? 'BLOQUEADO' : 'LIBRE',
   lobby: reserva ? { id: id * 10, estado: 'COMPLETO', privacidad: 'PUBLICO', cupos_ocupados: 4, reserva, codigo_reserva: null } : null,
 });
 
@@ -35,10 +37,14 @@ function montar(turnos: TurnoOcupacion[], cancelarPorClub = vi.fn().mockReturnVa
 const botonesCancelar = (el: HTMLElement) => [...el.querySelectorAll('button')].filter((b) => b.textContent!.trim() === 'Cancelar partida');
 
 describe('ClubOcupacion — cancelación por el club', () => {
-  it('ofrece cancelar solo las partidas vigentes de hoy en adelante', () => {
-    const ayer = '2020-01-01';
-    const { fixture } = montar([turno(1, 'PROVISORIA'), turno(2, 'CONFIRMADA'), turno(3, 'CUMPLIDA'), turno(4, null), turno(5, 'CONFIRMADA', ayer)]);
+  it('ofrece cancelar solo las partidas vigentes que todavía no empezaron', () => {
+    const { fixture } = montar([turno(1, 'PROVISORIA'), turno(2, 'CONFIRMADA'), turno(3, 'CUMPLIDA'), turno(4, null)]);
     expect(botonesCancelar(fixture.nativeElement)).toHaveLength(2);
+  });
+
+  it('un turno de hoy que ya empezó no ofrece cancelar; uno que todavía no empezó sí', () => {
+    const { fixture } = montar([turno(1, 'CONFIRMADA', enHoras(-1)), turno(2, 'CONFIRMADA', enHoras(1))]);
+    expect(botonesCancelar(fixture.nativeElement)).toHaveLength(1);
   });
 
   it('no deja enviar sin motivo ni con un motivo demasiado corto', () => {
