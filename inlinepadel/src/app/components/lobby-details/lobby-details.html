@@ -103,7 +103,7 @@
             @if (club(); as c) { <div><dt>Dirección</dt><dd>{{ c.direccion }}</dd></div> }
           </dl>
           <p class="muted small mt-3 mb-0">
-            @if (l.estado === 'EN_FORMACION') { Tienen hasta el {{ l.plazo_limite | date: 'EEE d/M, HH:mm' }} para completar los cuatro cupos. }
+            @if (l.vencido) { Venció el plazo para completar los cuatro cupos ({{ l.plazo_limite | date: 'EEE d/M, HH:mm' }}). La partida se va a cancelar y el turno queda libre. } @else if (l.estado === 'EN_FORMACION') { Tienen hasta el {{ l.plazo_limite | date: 'EEE d/M, HH:mm' }} para completar los cuatro cupos. }
             El alquiler se paga en el mostrador del club.
           </p>
         </section>

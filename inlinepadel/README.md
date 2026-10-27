@@ -26,6 +26,7 @@ docker compose up --build
 - Aplicación: http://localhost:4200 (nginx con el build de Angular)
 - API: http://localhost:8000/api (gunicorn + Django)
 - Base: PostgreSQL en el volumen `pgdata` (las migraciones corren solas al arrancar)
+- Scheduler: el servicio `scheduler` corre `vencer_lobbies` cada minuto (`docker compose logs -f scheduler`); el plazo igual se aplica en cada pedido, el job solo limpia lo que nadie tocó
 - Primer administrador: `docker compose exec app python manage.py createsuperuser`
 
 Los valores por defecto sirven solo para local; para cambiarlos copiá `.env.example` a `.env` junto al compose. Para frenar: `docker compose down` (con `-v` también borra los datos).

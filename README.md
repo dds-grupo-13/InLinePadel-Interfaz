@@ -47,6 +47,16 @@ docker compose down        # conserva los datos
 docker compose down -v     # borra también la base
 ```
 
+### Vencimiento de partidas (`scheduler`)
+
+El servicio `scheduler` corre `python manage.py vencer_lobbies` cada minuto y cancela las partidas en formación cuyo plazo ya pasó. Sus logs (una línea de contadores por corrida) se ven con:
+
+```powershell
+docker compose logs -f scheduler
+```
+
+El plazo se aplica igual en cada pedido a la API, así que el job solo limpia lo que nadie tocó.
+
 ## Build de producción
 
 ```powershell

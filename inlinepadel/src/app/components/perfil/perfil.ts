@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Zona } from '../../models/club.model';
@@ -22,6 +22,7 @@ export class Perfil implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly confirmar = inject(ConfirmarService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly posiciones = POSICIONES;
   readonly zonas = signal<Zona[]>([]);
@@ -52,6 +53,7 @@ export class Perfil implements OnInit {
     this.f = { username: j.usuario.username ?? this.f.username, first_name: j.usuario.first_name ?? '', last_name: j.usuario.last_name ?? '', email: j.usuario.email ?? '' };
     this.posicion = j.posicion;
     this.zona = j.zona;
+    this.cdr.markForCheck();
   }
 
   get noCoinciden(): boolean {

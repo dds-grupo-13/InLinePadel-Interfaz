@@ -18,6 +18,12 @@ describe('PartidaCard', () => {
     expect(pintar({ estado: 'COMPLETO', reserva_firme: true }).textContent).toContain('Reserva firme');
   });
 
+  it('en un lobby vencido muestra "Plazo vencido" y no los cupos que faltan', () => {
+    const texto = pintar({ vencido: true }).textContent;
+    expect(texto).toContain('Plazo vencido');
+    expect(texto).not.toContain('Faltan');
+  });
+
   it('no muestra el chip si la reserva no es firme', () => {
     expect(pintar({ estado: 'COMPLETO' }).textContent).not.toContain('Reserva firme');
   });

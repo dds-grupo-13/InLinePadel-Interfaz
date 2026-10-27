@@ -39,7 +39,9 @@ import { Estado } from '../estado/estado';
       <app-cupos [inscripciones]="l.inscripciones" [ancho]="96" />
       <div class="pie">
         <div class="d-flex flex-wrap gap-2 align-items-center">
-          @if (l.estado === 'EN_FORMACION' || l.estado === 'COMPLETO') {
+          @if (l.vencido) {
+            <span class="estado bad">Plazo vencido</span>
+          } @else if (l.estado === 'EN_FORMACION' || l.estado === 'COMPLETO') {
             <app-estado [valor]="l.estado_reserva ?? l.estado" />
           } @else {
             <app-estado [valor]="l.estado" />
@@ -48,7 +50,7 @@ import { Estado } from '../estado/estado';
           @if (l.reserva_firme) {
             <span class="estado warn"><i class="bi bi-lock-fill" aria-hidden="true"></i> Reserva firme</span>
           }
-          @if (l.estado === 'EN_FORMACION') {
+          @if (l.estado === 'EN_FORMACION' && !l.vencido) {
             <span class="muted small">{{ l.cupos_libres === 1 ? 'Falta 1 jugador' : 'Faltan ' + l.cupos_libres + ' jugadores' }}</span>
           }
           @if (l.aviso_cierre) {

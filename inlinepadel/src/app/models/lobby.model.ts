@@ -17,6 +17,7 @@ export interface Lobby {
   id: number;
   privacidad: Privacidad;
   estado: EstadoLobby;
+  vencido: boolean;
   fecha_creacion: string;
   plazo_limite: string;
   fecha_check_in: string;

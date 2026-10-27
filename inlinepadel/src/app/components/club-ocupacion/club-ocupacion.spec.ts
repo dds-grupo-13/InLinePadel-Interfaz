@@ -15,7 +15,7 @@ const enHoras = (h: number) => new Date(Date.now() + h * 3_600_000).toISOString(
 
 const turno = (id: number, reserva: 'PROVISORIA' | 'CONFIRMADA' | 'CUMPLIDA' | null, inicio = enHoras(2)): TurnoOcupacion => ({
   id, fecha: hoyIso(), hora_inicio: '20:00:00', inicio, fin: enHoras(3.5), cancha: 1, cancha_numero: 1, estado: reserva ? 'BLOQUEADO' : 'LIBRE',
-  lobby: reserva ? { id: id * 10, estado: 'COMPLETO', privacidad: 'PUBLICO', cupos_ocupados: 4, reserva, codigo_reserva: null } : null,
+  lobby: reserva ? { id: id * 10, estado: 'COMPLETO', vencido: false, privacidad: 'PUBLICO', cupos_ocupados: 4, reserva, codigo_reserva: null } : null,
 });
 
 function montar(turnos: TurnoOcupacion[], cancelarPorClub = vi.fn().mockReturnValue(of({}))) {

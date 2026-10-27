@@ -30,7 +30,8 @@ export class ClubPanel {
   readonly cuenta = computed(() => {
     const t = this.turnos();
     const n = (e: string) => t.filter((x) => x.estado === e).length;
-    return { total: t.length, libres: n('LIBRE'), provisorias: n('BLOQUEADO'), confirmadas: n('CONFIRMADO') + n('CUMPLIDO'), retirados: n('NO_DISPONIBLE') };
+    const liberables = t.filter((x) => x.estado === 'BLOQUEADO' && x.lobby?.vencido).length;
+    return { total: t.length, libres: n('LIBRE') + liberables, provisorias: n('BLOQUEADO') - liberables, confirmadas: n('CONFIRMADO') + n('CUMPLIDO'), retirados: n('NO_DISPONIBLE') };
   });
   readonly reservas = computed(() => this.turnos().filter((t) => t.lobby));
 

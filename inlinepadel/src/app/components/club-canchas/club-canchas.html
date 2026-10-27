@@ -6,7 +6,7 @@
     </div>
     <div class="acciones">
       <app-club-selector />
-      <button type="button" class="btn btn-primary" (click)="abrirForm(null)" [disabled]="!ctx.club()"><i class="bi bi-plus-lg" aria-hidden="true"></i> Nueva cancha</button>
+      <button type="button" class="btn btn-primary" (click)="abrirForm(null)" [disabled]="!ctx.club() || ctx.club()?.estado === 'BAJA'" [attr.title]="ctx.club()?.estado === 'BAJA' ? 'El club está dado de baja' : null"><i class="bi bi-plus-lg" aria-hidden="true"></i> Nueva cancha</button>
     </div>
   </div>
 

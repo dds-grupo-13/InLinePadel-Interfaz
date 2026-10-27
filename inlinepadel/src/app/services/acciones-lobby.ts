@@ -68,8 +68,9 @@ export class AccionesLobby {
       await firstValueFrom(this.api.abandonar(l.id));
       this.toast.ok('Saliste de la partida.');
     } catch (e) {
-      this.toast.error(leerError(e, 'No pudimos sacarte de la partida.').mensaje);
-      return false;
+      const err = leerError(e, 'No pudimos sacarte de la partida.');
+      this.toast.error(err.mensaje);
+      return err.status === 409;
     }
     return true;
   }
@@ -87,8 +88,9 @@ export class AccionesLobby {
       await firstValueFrom(this.api.cancelar(l.id));
       this.toast.ok('Cancelaste la partida. El turno quedó libre.');
     } catch (e) {
-      this.toast.error(leerError(e, 'No pudimos cancelar la partida.').mensaje);
-      return false;
+      const err = leerError(e, 'No pudimos cancelar la partida.');
+      this.toast.error(err.mensaje);
+      return err.status === 409;
     }
     return true;
   }

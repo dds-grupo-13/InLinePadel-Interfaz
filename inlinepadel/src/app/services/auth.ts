@@ -3,6 +3,7 @@ import { Service, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { ClubActual } from './club-actual';
 import { LoginResponse, Rol, Usuario } from '../models/usuario.model';
 
 const ACCESS_KEY = 'access';
@@ -31,6 +32,7 @@ function escribir(clave: string, valor: string | null): void {
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly clubActual = inject(ClubActual);
   private readonly url = `${environment.apiUrl}/usuarios/auth`;
 
   private readonly _usuario = signal<Usuario | null>(this.usuarioGuardado());
@@ -110,6 +112,7 @@ export class AuthService {
     escribir(USUARIO_KEY, null);
     this._usuario.set(null);
     this._logueado.set(false);
+    this.clubActual.reiniciar();
   }
 
   private usuarioGuardado(): Usuario | null {

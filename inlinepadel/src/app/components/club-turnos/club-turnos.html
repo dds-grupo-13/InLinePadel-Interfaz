@@ -41,7 +41,7 @@
               <button type="button" class="ficha" [class]="'ficha ' + t.estado.toLowerCase()" (click)="abrir(t)">
                 <strong>{{ t.hora_inicio | hhmm }}</strong>
                 <small>{{ t.precio | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</small>
-                <small>{{ t.estado === 'LIBRE' ? 'Libre' : t.estado === 'BLOQUEADO' ? 'Provisoria' : t.estado === 'CONFIRMADO' ? 'Confirmada' : t.estado === 'CUMPLIDO' ? 'Cumplido' : 'No disponible' }}</small>
+                <small [class.estado]="t.liberable" [class.bad]="t.liberable">{{ t.estado === 'LIBRE' ? 'Libre' : t.estado === 'BLOQUEADO' ? (t.liberable ? 'Provisoria · plazo vencido' : 'Provisoria') : t.estado === 'CONFIRMADO' ? 'Confirmada' : t.estado === 'CUMPLIDO' ? 'Cumplido' : 'No disponible' }}</small>
               </button>
             } @empty {
               <span class="muted">No hay turnos publicados este día.</span>
@@ -64,10 +64,14 @@
         </dl>
         @if (estaEditable(t)) {
           <div class="pie-modal justify-content-between">
-            <button type="button" class="btn btn-outline-danger" (click)="eliminar()" [disabled]="ocupado()">Eliminar</button>
+            @if (!t.liberable) {
+              <button type="button" class="btn btn-outline-danger" (click)="eliminar()" [disabled]="ocupado()">Eliminar</button>
+            }
             <span class="acciones">
-              <button type="button" class="btn btn-tool" (click)="empezarEdicion()">Editar</button>
-              @if (t.estado === 'LIBRE') {
+              @if (!t.liberable) {
+                <button type="button" class="btn btn-tool" (click)="empezarEdicion()">Editar</button>
+              }
+              @if (t.estado === 'LIBRE' || t.liberable) {
                 <button type="button" class="btn btn-primary" (click)="retirar()" [disabled]="ocupado()">Retirar de la oferta</button>
               } @else {
                 <button type="button" class="btn btn-primary" (click)="publicar()" [disabled]="ocupado()">Volver a ofrecerlo</button>

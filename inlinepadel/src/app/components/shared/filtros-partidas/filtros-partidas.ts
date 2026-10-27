@@ -39,6 +39,8 @@ import { hoyIso, sumarDias } from '../../../utils/fechas';
           </div>
         </div>
 
+        <ng-content />
+
         @if (activos() > 0) {
           <button type="button" class="btn btn-tool btn-sm filtros-limpiar" (click)="limpiar()">
             <i class="bi bi-x-lg" aria-hidden="true"></i> Limpiar

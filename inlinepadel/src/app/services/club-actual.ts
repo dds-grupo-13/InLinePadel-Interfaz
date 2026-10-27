@@ -15,10 +15,18 @@ export class ClubActual {
 
   readonly club = computed(() => this.clubes().find((c) => c.id === this._id()) ?? this.clubes()[0] ?? null);
 
+  private generacion = 0;
+  private enCurso = false;
+
+  /** Trae los clubes del usuario; si ya había datos los deja visibles mientras se refrescan. */
   cargar(): void {
-    if (this.cargado()) return;
+    if (this.enCurso) return;
+    this.enCurso = true;
+    const gen = this.generacion;
     this.api.todos().subscribe({
       next: (cs) => {
+        if (gen !== this.generacion) return;
+        this.enCurso = false;
         this.clubes.set(cs);
         let guardado: number | null = null;
         try {
@@ -27,8 +35,25 @@ export class ClubActual {
         this._id.set(guardado);
         this.cargado.set(true);
       },
-      error: () => this.error.set('No pudimos cargar los datos de tu club.'),
+      error: () => {
+        if (gen !== this.generacion) return;
+        this.enCurso = false;
+        this.error.set('No pudimos cargar los datos de tu club.');
+      },
     });
+  }
+
+  /** Olvida todo lo del usuario anterior (se llama al cerrar sesión). */
+  reiniciar(): void {
+    this.generacion++;
+    this.enCurso = false;
+    this.clubes.set([]);
+    this.cargado.set(false);
+    this.error.set(null);
+    this._id.set(null);
+    try {
+      localStorage.removeItem(CLAVE);
+    } catch {}
   }
 
   elegir(id: number): void {
@@ -39,7 +64,6 @@ export class ClubActual {
   }
 
   recargar(): void {
-    this.cargado.set(false);
     this.cargar();
   }
 }

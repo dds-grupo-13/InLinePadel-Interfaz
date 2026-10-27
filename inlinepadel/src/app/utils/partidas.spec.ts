@@ -63,5 +63,6 @@ describe('partidas', () => {
     expect(sePuedeUnir(lobby({ privacidad: 'PRIVADO', fui_invitado: true }))).toBe(true);
     expect(sePuedeUnir(lobby({ cupos_libres: 0 }))).toBe(false);
     expect(sePuedeUnir(lobby({ estado: 'COMPLETO' }))).toBe(false);
+    expect(sePuedeUnir(lobby({ vencido: true }))).toBe(false);
   });
 });

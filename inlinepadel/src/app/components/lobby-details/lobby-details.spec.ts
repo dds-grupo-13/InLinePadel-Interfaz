@@ -164,6 +164,15 @@ describe('LobbyDetails — avisos de cierre y textos', () => {
     expect(el.textContent!.split(aviso)).toHaveLength(2);
   });
 
+  it('con el plazo vencido lo dice y no ofrece unirse ni invitar', () => {
+    const el: HTMLElement = montar(lobby({ vencido: true })).nativeElement;
+    expect(el.textContent).toContain('Venció el plazo');
+    expect(el.textContent).not.toContain('Tienen hasta el');
+    const botones = Array.from(el.querySelectorAll('button')).map((b) => b.textContent);
+    expect(botones.some((t) => t?.includes('Unirme'))).toBe(false);
+    expect(botones.some((t) => t?.includes('Invitar amigos'))).toBe(false);
+  });
+
   it('no promete que el turno se libera solo y dice hasta cuándo hay plazo', () => {
     const el: HTMLElement = montar(lobby({ plazo_limite: '2026-10-21T10:00:00-03:00' })).nativeElement;
     expect(el.textContent).not.toContain('libera solo');

@@ -46,7 +46,7 @@ export class ClubTurnos {
     return conocidas.filter((c) => c.turnos.length || c.cancha.activa);
   });
 
-  protected readonly estaEditable = (t: Turno) => t.estado === 'LIBRE' || t.estado === 'NO_DISPONIBLE';
+  protected readonly estaEditable = (t: Turno) => t.estado === 'LIBRE' || t.estado === 'NO_DISPONIBLE' || !!t.liberable;
 
   constructor() {
     this.ctx.cargar();

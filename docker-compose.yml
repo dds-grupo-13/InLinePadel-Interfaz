@@ -1,3 +1,14 @@
+x-backend-env: &backend-env
+    DEBUG: "0"
+    SECRET_KEY: ${SECRET_KEY:-solo-para-desarrollo-local-cambiar}
+    ALLOWED_HOSTS: localhost,127.0.0.1
+    DB_NAME: ${DB_NAME:-inline_padel_db}
+    DB_USER: ${DB_USER:-inline}
+    DB_PASSWORD: ${DB_PASSWORD:-inline_local}
+    DB_HOST: db
+    DB_PORT: "5432"
+    CORS_ALLOWED_ORIGINS: http://localhost:4200
+
 services:
   db:
     image: postgres:17
@@ -15,21 +26,22 @@ services:
 
   app:
     build: ../InLinePadel
-    environment:
-      DEBUG: "0"
-      SECRET_KEY: ${SECRET_KEY:-solo-para-desarrollo-local-cambiar}
-      ALLOWED_HOSTS: localhost,127.0.0.1
-      DB_NAME: ${DB_NAME:-inline_padel_db}
-      DB_USER: ${DB_USER:-inline}
-      DB_PASSWORD: ${DB_PASSWORD:-inline_local}
-      DB_HOST: db
-      DB_PORT: "5432"
-      CORS_ALLOWED_ORIGINS: http://localhost:4200
+    image: inlinepadel-backend
+    environment: *backend-env
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
+
+  scheduler:
+    build: ../InLinePadel
+    image: inlinepadel-backend
+    environment: *backend-env
+    command: sh -c "while true; do python manage.py vencer_lobbies; sleep 60; done"
+    depends_on:
+      - app
+    restart: unless-stopped
 
   web:
     build:

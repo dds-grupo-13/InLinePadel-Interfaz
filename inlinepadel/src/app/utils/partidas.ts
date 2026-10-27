@@ -69,6 +69,7 @@ export function agruparTurnos(turnos: Turno[]): GrupoTurno[] {
 export function sePuedeUnir(lobby: Lobby): boolean {
   return (
     lobby.estado === 'EN_FORMACION' &&
+    !lobby.vencido &&
     lobby.cupos_libres > 0 &&
     (lobby.privacidad === 'PUBLICO' || lobby.fui_invitado)
   );

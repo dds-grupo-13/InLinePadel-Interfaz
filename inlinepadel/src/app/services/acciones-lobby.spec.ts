@@ -13,7 +13,7 @@ import { ToastService } from './toast';
 
 registerLocaleData(localeEsAr, 'es-AR');
 
-function preparar(unirse: () => unknown = () => of({}), confirma = false) {
+function preparar(unirse: () => unknown = () => of({}), confirma = false, otros: Record<string, () => unknown> = {}) {
   const pedirConfirmacion = vi.fn().mockResolvedValue(confirma);
   const error = vi.fn();
   TestBed.configureTestingModule({
@@ -21,7 +21,7 @@ function preparar(unirse: () => unknown = () => of({}), confirma = false) {
       provideRouter([]),
       provideHttpClient(),
       { provide: ConfirmarService, useValue: { pedirConfirmacion } },
-      { provide: LobbyService, useValue: { abandonar: () => of({}), unirse } },
+      { provide: LobbyService, useValue: { abandonar: () => of({}), cancelar: () => of({}), unirse, ...otros } },
       { provide: ToastService, useValue: { ok: vi.fn(), error } },
     ],
   });
@@ -73,5 +73,25 @@ describe('AccionesLobby.unirse', () => {
     const { acciones } = preparar(unirse, false);
     expect(await acciones.unirse(lobby(), false)).toBe(false);
     expect(unirse).not.toHaveBeenCalled();
+  });
+});
+
+describe('AccionesLobby abandonar/cancelar ante un 409 (plazo vencido)', () => {
+  const falla = (status: number) => () => throwError(() => new HttpErrorResponse({ status, error: { detail: 'Venció el plazo.' } }));
+
+  it('abandonar pide refrescar con 409', async () => {
+    expect(await preparar(undefined, true, { abandonar: falla(409) }).acciones.abandonar(lobby())).toBe(true);
+  });
+
+  it('abandonar no pide refrescar con otros errores', async () => {
+    expect(await preparar(undefined, true, { abandonar: falla(500) }).acciones.abandonar(lobby())).toBe(false);
+  });
+
+  it('cancelar pide refrescar con 409', async () => {
+    expect(await preparar(undefined, true, { cancelar: falla(409) }).acciones.cancelar(lobby())).toBe(true);
+  });
+
+  it('cancelar no pide refrescar con otros errores', async () => {
+    expect(await preparar(undefined, true, { cancelar: falla(500) }).acciones.cancelar(lobby())).toBe(false);
   });
 });

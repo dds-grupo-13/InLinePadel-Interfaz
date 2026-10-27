@@ -41,6 +41,7 @@ export interface Turno {
   duracion: number;
   precio: string;
   estado: EstadoTurno;
+  liberable?: boolean;
   cancha: number;
   inicio: string;
   fin: string;
@@ -71,6 +72,7 @@ export interface TurnoOcupacion {
   lobby: {
     id: number;
     estado: string;
+    vencido: boolean;
     privacidad: string;
     cupos_ocupados: number;
     reserva: 'CONFIRMADA' | 'PROVISORIA' | 'CUMPLIDA';
