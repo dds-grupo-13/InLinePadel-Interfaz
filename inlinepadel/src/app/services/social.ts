@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Service, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contacto, Invitacion } from '../models/social.model';
-import { traerTodas } from '../utils/http';
+import { Page } from '../models/page.model';
+import { aParams, traerTodas } from '../utils/http';
 
 @Service()
 export class SocialService {
@@ -28,6 +29,11 @@ export class SocialService {
 
   invitaciones(filtros: { rol?: 'enviadas' | 'recibidas'; lobby?: number; estado?: string } = {}): Observable<Invitacion[]> {
     return traerTodas<Invitacion>(this.http, `${this.base}/invitaciones/`, filtros);
+  }
+  contarInvitaciones(filtros: { rol?: 'enviadas' | 'recibidas'; estado?: string } = {}): Observable<number> {
+    return this.http
+      .get<Page<Invitacion>>(`${this.base}/invitaciones/`, { params: aParams({ ...filtros, page: 1 }) })
+      .pipe(map((r) => r.count));
   }
   invitar(lobby: number, receptor: number): Observable<Invitacion> {
     return this.http.post<Invitacion>(`${this.base}/invitaciones/`, { lobby, receptor });

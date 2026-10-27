@@ -70,7 +70,7 @@ export interface TurnoOcupacion {
     estado: string;
     privacidad: string;
     cupos_ocupados: number;
-    reserva: 'CONFIRMADA' | 'PROVISORIA';
+    reserva: 'CONFIRMADA' | 'PROVISORIA' | 'CUMPLIDA';
     codigo_reserva: string | null;
   } | null;
 }

@@ -5,6 +5,10 @@ import { Page } from '../models/page.model';
 export function aParams(filtros: object = {}): HttpParams {
   let p = new HttpParams();
   for (const [k, v] of Object.entries(filtros)) {
+    if (Array.isArray(v)) {
+      for (const item of v) p = p.append(k, String(item));
+      continue;
+    }
     if (v === null || v === undefined || v === '') continue;
     p = p.set(k, String(v));
   }

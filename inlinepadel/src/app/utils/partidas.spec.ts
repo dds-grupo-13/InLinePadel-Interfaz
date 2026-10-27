@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Turno } from '../models/club.model';
 import { Lobby } from '../models/lobby.model';
-import { agruparPorDia, agruparTurnos, capitanDe, conteoPorClub, resumenPorClub, sePuedeUnir } from './partidas';
+import { agruparPorDia, agruparTurnos, capitanDe, resumenesPorClub, sePuedeUnir } from './partidas';
 
 const turno = (extra: Partial<Turno> = {}): Turno => ({
   id: 1,
@@ -71,42 +71,19 @@ describe('partidas', () => {
     expect(capitanDe(l)).toBe('nico');
   });
 
-  it('cuenta las partidas por club', () => {
-    const conteo = conteoPorClub([
-      lobby(),
-      lobby({ id: 2 }),
-      lobby({ id: 3, turno_detalle: turno({ club: 2 }) }),
+  it('adapta el resumen que devuelve el backend por club', () => {
+    const resumen = resumenesPorClub([
+      { club: 1, disponibles: 2, cupos_libres: 5, invitaciones: 1, proximo: { id: 2, fecha: '2026-10-20', hora_inicio: '18:00:00', inicio: '2026-10-20T18:00:00' } },
+      { club: 2, disponibles: 1, cupos_libres: 3, invitaciones: 0, proximo: null },
     ]);
-    expect(conteo.get(1)).toBe(2);
-    expect(conteo.get(2)).toBe(1);
-  });
-
-  it('resume la oferta de cada club para el inicio', () => {
-    const resumen = resumenPorClub([
-      lobby({
-        id: 1,
-        fui_invitado: true,
-        cupos_libres: 2,
-        turno_detalle: turno({ club: 1, inicio: '2026-10-20T20:00:00' }),
-      }),
-      lobby({
-        id: 2,
-        cupos_libres: 3,
-        turno_detalle: turno({ club: 1, inicio: '2026-10-20T18:00:00' }),
-      }),
-      lobby({
-        id: 3,
-        privacidad: 'PRIVADO',
-        turno_detalle: turno({ club: 2, inicio: '2026-10-21T20:00:00' }),
-      }),
-    ]);
-    expect(resumen.get(1)).toMatchObject({
+    expect(resumen.get(1)).toEqual({
       disponibles: 2,
       invitaciones: 1,
       cuposLibres: 5,
-      proximo: { id: 2 },
+      proximo: { id: 2, fecha: '2026-10-20', hora_inicio: '18:00:00', inicio: '2026-10-20T18:00:00' },
     });
-    expect(resumen.has(2)).toBe(false);
+    expect(resumen.get(2)?.proximo).toBeNull();
+    expect(resumen.has(3)).toBe(false);
   });
 
   it('agrupa por día y ordena por fecha y hora', () => {

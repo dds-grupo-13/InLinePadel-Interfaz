@@ -8,7 +8,7 @@ const MAPA: Record<string, [string, string]> = {
   PENDIENTE: ['Pendiente', 'warn'], ACEPTADA: ['Aceptada', 'ok'], ACEPTADO: ['Aceptado', 'ok'],
   RECHAZADA: ['Rechazada', 'bad'], RECHAZADO: ['Rechazado', 'bad'], EXPIRADA: ['Vencida', 'off'],
   PUBLICO: ['Pública', 'info'], PRIVADO: ['Solo invitados', 'off'],
-  PROVISORIA: ['Reserva provisoria', 'warn'], CONFIRMADA: ['Reserva confirmada', 'ok'],
+  PROVISORIA: ['Reserva provisoria', 'warn'], CONFIRMADA: ['Reserva confirmada', 'ok'], CUMPLIDA: ['Reserva cumplida', 'off'],
 };
 
 @Component({

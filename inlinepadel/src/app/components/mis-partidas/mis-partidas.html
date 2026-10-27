@@ -9,7 +9,7 @@
 
   <div class="pestanas" role="tablist">
     <button type="button" role="tab" [class.activa]="pestana() === 'proximas'" [attr.aria-selected]="pestana() === 'proximas'" (click)="pestana.set('proximas')">
-      Próximas<span class="cuenta">{{ proximas().length }}</span>
+      Próximas<span class="cuenta">{{ proximas().count }}</span>
     </button>
     <button type="button" role="tab" [class.activa]="pestana() === 'historial'" [attr.aria-selected]="pestana() === 'historial'" (click)="pestana.set('historial')">
       Historial
@@ -19,11 +19,12 @@
   @if (error()) {
     <div class="alerta bad" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span>{{ error() }}</span></div>
   }
-  @if (cargando()) {
+  @let lista = listado();
+  @if (lista.cargando && lista.items.length === 0) {
     <div class="cargando" role="status" aria-label="Cargando"></div>
   } @else {
     <div class="lista-partidas">
-      @for (l of visibles(); track l.id) {
+      @for (l of lista.items; track l.id) {
         <app-partida-card [lobby]="l" [esMia]="true" origen="mis-partidas" />
       } @empty {
         <div class="vacio" style="grid-column: 1 / -1">
@@ -41,5 +42,6 @@
         </div>
       }
     </div>
+    <app-paginador [count]="lista.count" [pagina]="lista.pagina" (cambio)="irAPagina(pestana(), $event)" />
   }
 </div>

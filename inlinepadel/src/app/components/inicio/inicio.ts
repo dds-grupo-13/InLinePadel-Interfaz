@@ -1,21 +1,24 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { catchError, forkJoin, of } from 'rxjs';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { Club, Zona } from '../../models/club.model';
-import { Lobby } from '../../models/lobby.model';
+import { FiltrosBusqueda } from '../../models/lobby.model';
 import { ClubService } from '../../services/club';
 import { LobbyService } from '../../services/lobby';
 import { SocialService } from '../../services/social';
 import { ZonaService } from '../../services/zona';
 import { leerError } from '../../utils/errores';
 import { hoyIso, sumarDias } from '../../utils/fechas';
-import { ResumenClub, resumenPorClub } from '../../utils/partidas';
+import { filtrosAQuery, filtrosDesdeQuery } from '../../utils/filtros';
 import { HhmmPipe } from '../../utils/hhmm.pipe';
+import { ResumenClub, resumenesPorClub } from '../../utils/partidas';
+import { FiltrosPartidas } from '../shared/filtros-partidas/filtros-partidas';
 
 @Component({
-  imports: [FormsModule, RouterLink, HhmmPipe],
+  imports: [FormsModule, RouterLink, HhmmPipe, FiltrosPartidas],
   selector: 'app-inicio',
   templateUrl: './inicio.html',
 })
@@ -24,26 +27,26 @@ export class Inicio implements OnInit {
   private readonly lobbies = inject(LobbyService);
   private readonly zonasApi = inject(ZonaService);
   private readonly social = inject(SocialService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly fecha = new DatePipe('es-AR');
 
   readonly clubes = signal<Club[]>([]);
   readonly zonas = signal<Zona[]>([]);
-  readonly partidas = signal<Lobby[]>([]);
+  readonly resumenes = signal<Map<number, ResumenClub>>(new Map());
   readonly invitaciones = signal(0);
-  readonly cargando = signal(true);
+  private readonly clubesListos = signal(false);
+  private readonly resumenListo = signal(false);
+  readonly cargando = computed(() => !this.error() && !(this.clubesListos() && this.resumenListo()));
+  readonly buscando = signal(false);
   readonly error = signal<string | null>(null);
   readonly zona = signal<number | null>(null);
+  readonly filtros = signal<FiltrosBusqueda>(filtrosDesdeQuery(this.route.snapshot.queryParamMap));
+  private readonly consulta = computed(() => ({ ...this.filtros(), zona: this.zona() }));
 
-  readonly resumenes = computed(() => resumenPorClub(this.partidas()));
-  readonly totalDisponibles = computed(() =>
-    [...this.resumenes().values()].reduce((total, r) => total + r.disponibles, 0),
-  );
-  readonly totalInvitaciones = computed(() =>
-    [...this.resumenes().values()].reduce((total, r) => total + r.invitaciones, 0),
-  );
-  readonly totalCuposLibres = computed(() =>
-    [...this.resumenes().values()].reduce((total, r) => total + r.cuposLibres, 0),
-  );
+  readonly totalDisponibles = computed(() => this.sumar((r) => r.disponibles));
+  readonly totalInvitaciones = computed(() => this.sumar((r) => r.invitaciones));
+  readonly totalCuposLibres = computed(() => this.sumar((r) => r.cuposLibres));
   readonly clubesVisibles = computed(() =>
     this.clubes()
       .filter((c) => this.zona() === null || c.zona === this.zona())
@@ -81,26 +84,52 @@ export class Inicio implements OnInit {
     forkJoin({
       clubes: this.clubesApi.todos(),
       zonas: this.zonasApi.getAll(),
-      partidas: this.lobbies.todos({ estado: 'EN_FORMACION', con_cupos: true, mios: false }),
-      invitaciones: this.social
-        .invitaciones({ rol: 'recibidas', estado: 'PENDIENTE' })
-        .pipe(catchError(() => of([]))),
+      invitaciones: this.social.contarInvitaciones({ rol: 'recibidas', estado: 'PENDIENTE' }).pipe(catchError(() => of(0))),
     }).subscribe({
       next: (r) => {
         this.clubes.set(r.clubes);
         this.zonas.set(r.zonas);
-        this.partidas.set(r.partidas);
-        this.invitaciones.set(r.invitaciones.length);
-        this.cargando.set(false);
+        this.invitaciones.set(r.invitaciones);
+        this.clubesListos.set(true);
       },
-      error: (e) => {
-        this.error.set(leerError(e, 'No pudimos cargar los clubes.').mensaje);
-        this.cargando.set(false);
-      },
+      error: (e) => this.error.set(leerError(e, 'No pudimos cargar los clubes.').mensaje),
     });
+  }
+
+  filtrar(filtros: FiltrosBusqueda): void {
+    this.filtros.set(filtros);
+    this.router.navigate([], { relativeTo: this.route, queryParams: filtrosAQuery(filtros), queryParamsHandling: 'merge', replaceUrl: true });
   }
 
   verTodas(): void {
     this.zona.set(null);
+  }
+
+  private sumar(campo: (r: ResumenClub) => number): number {
+    return this.clubesVisibles().reduce((total, c) => total + campo(this.resumenDe(c)), 0);
+  }
+
+  constructor() {
+    toObservable(this.consulta)
+      .pipe(
+        tap(() => this.buscando.set(true)),
+        switchMap((c) =>
+          this.lobbies.resumenPorClub(c).pipe(
+            map((filas) => ({ filas })),
+            catchError((e) => of({ e })),
+          ),
+        ),
+        takeUntilDestroyed(),
+      )
+      .subscribe((r) => {
+        this.buscando.set(false);
+        this.resumenListo.set(true);
+        if ('filas' in r) {
+          this.error.set(null);
+          this.resumenes.set(resumenesPorClub(r.filas));
+        } else {
+          this.error.set(leerError(r.e, 'No pudimos cargar las partidas.').mensaje);
+        }
+      });
   }
 }

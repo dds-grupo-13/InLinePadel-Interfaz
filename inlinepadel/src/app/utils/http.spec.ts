@@ -11,6 +11,12 @@ describe('http', () => {
     expect(p.get('leida')).toBe('false');
   });
 
+  it('repite el parámetro cuando el valor es un arreglo', () => {
+    const p = aParams({ estado: ['EN_FORMACION', 'COMPLETO'], mios: true, vacio: [] });
+    expect(p.getAll('estado')).toEqual(['EN_FORMACION', 'COMPLETO']);
+    expect(p.toString()).toBe('estado=EN_FORMACION&estado=COMPLETO&mios=true');
+  });
+
   it('recorre todas las páginas del listado', () => {
     TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
     const http = TestBed.inject(HttpClient);
