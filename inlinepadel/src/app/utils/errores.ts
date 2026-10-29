@@ -41,8 +41,10 @@ const GENERALES = new Set(['detail', 'non_field_errors']);
 function aplanar(valor: unknown, clave: string, generales: string[], campos: Record<string, string>): void {
   if (valor == null) return;
   if (typeof valor === 'string') {
-    if (!clave || GENERALES.has(clave)) generales.push(valor);
-    else campos[clave] = campos[clave] ? `${campos[clave]} ${valor}` : valor;
+    if (!clave || GENERALES.has(clave)) {
+      if (!generales.includes(valor)) generales.push(valor);
+    } else if (!campos[clave]) campos[clave] = valor;
+    else if (!campos[clave].includes(valor)) campos[clave] += ` ${valor}`;
     return;
   }
   if (Array.isArray(valor)) {
